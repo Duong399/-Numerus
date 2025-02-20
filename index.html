@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔮 Numerus</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('background.png');
+            background-size: cover;
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        input, select, button {
+            padding: 10px;
+            margin: 5px;
+            width: 100%;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+        .result {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+            padding: 10px;
+            background: transparent;
+            border-radius: 10px;
+        }
+
+        .result-item {
+            flex: 1 1 calc(22.22% - 10px);
+            min-width: 200px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+        .current-date-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .current-date-container select {
+            flex: 1;
+            min-width: 100px;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Numerology Calculator</h1>
+        <input type="text" id="name" placeholder="Nhập họ tên">
+        <h2 style="font-size: 20px;">Nhập ngày/tháng/năm sinh</h2>
+        <div class="current-date-container">
+            <select id="birthDay"></select>
+            <select id="birthMonth"></select>
+            <select id="birthYear"></select>
+        </div>
+        <h3 style="font-size: 20px;">Nhập ngày/tháng/năm hiên tại</h3>
+        <div class="current-date-container">
+            <select id="currentYear"></select>
+            <select id="currentMonth"></select>
+            <select id="currentDay"></select>
+        </div>        
+        <button onclick="calculateNumerology()">Tính toán</button>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        function populateDateFields() {
+            const yearSelect = document.getElementById('currentYear');
+            const monthSelect = document.getElementById('currentMonth');
+            const daySelect = document.getElementById('currentDay');
+            const currentYear = new Date().getFullYear();
+
+            for (let y = 2000; y <= currentYear + 10; y++) {
+                yearSelect.innerHTML += `<option value="${y}">${y}</option>`;
+            }
+
+            for (let m = 1; m <= 12; m++) {
+                monthSelect.innerHTML += `<option value="${m}">${m}</option>`;
+            }
+
+            for (let d = 1; d <= 31; d++) {
+                daySelect.innerHTML += `<option value="${d}">${d}</option>`;
+            }
+
+            yearSelect.value = currentYear;
+            monthSelect.value = new Date().getMonth() + 1;
+            daySelect.value = new Date().getDate();
+        }
+        function populateBirthDateFields() {
+            const birthYearSelect = document.getElementById('birthYear');
+            const birthMonthSelect = document.getElementById('birthMonth');
+            const birthDaySelect = document.getElementById('birthDay');
+            const currentYear = new Date().getFullYear();
+
+            for (let y = 1900; y <= currentYear; y++) {
+                birthYearSelect.innerHTML += `<option value="${y}">${y}</option>`;
+            }
+
+            for (let m = 1; m <= 12; m++) {
+                birthMonthSelect.innerHTML += `<option value="${m}">${m}</option>`;
+            }
+
+            updateDays(birthMonthSelect.value, birthYearSelect.value);
+
+            birthMonthSelect.addEventListener('change', () => updateDays(birthMonthSelect.value, birthYearSelect.value));
+            birthYearSelect.addEventListener('change', () => updateDays(birthMonthSelect.value, birthYearSelect.value));
+
+            birthYearSelect.value = currentYear - 20;
+            birthMonthSelect.value = 1;
+            birthDaySelect.value = 1;
+        }
+
+        function updateDays(month, year) {
+            const birthDaySelect = document.getElementById('birthDay');
+            birthDaySelect.innerHTML = '';
+            const daysInMonth = new Date(year, month, 0).getDate();
+            for (let d = 1; d <= daysInMonth; d++) {
+                birthDaySelect.innerHTML += `<option value="${d}">${d}</option>`;
+            }
+        }
+
+
+        function reduceNumber(n) {
+            while (n >= 10 && ![11, 22, 33].includes(n)) {
+                n = n.toString().split('').reduce((sum, digit) => sum + parseInt(digit), 0);
+            }
+            return n;
+        }
+
+        function chang_reduceNumber(n) {
+            while (n >= 10) {
+                n = n.toString().split('').reduce((sum, digit) => sum + parseInt(digit), 0);
+            }
+            return n;
+        }
+
+        const letterValues = {
+            'a': 1, 'b': 2, 'c': 3, 'd': 4, 'e': 5, 'f': 6, 'g': 7, 'h': 8, 'i': 9,
+            'j': 1, 'k': 2, 'l': 3, 'm': 4, 'n': 5, 'o': 6, 'p': 7, 'q': 8, 'r': 9,
+            's': 1, 't': 2, 'u': 3, 'v': 4, 'w': 5, 'x': 6, 'y': 7, 'z': 8
+        };
+
+        function calculateNameValue(name) {
+            const nameParts = name.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").split(" ");
+            let soulValue = 0, personalityValue = 0;
+            const vowels = "aeiou";
+
+            const reducedSums = [];
+            const firstLetterValues = [];
+
+            for (const part of nameParts) {
+                let totalSum = 0;
+                for (const char of part) {
+                    const value = letterValues[char] || 0;
+                    totalSum += value;
+                    if (vowels.includes(char)) {
+                        soulValue += value;
+                    } else {
+                        personalityValue += value;
+                    }
+                }
+                reducedSums.push(reduceNumber(totalSum));
+                if (part.length > 0) {
+                    firstLetterValues.push(letterValues[part[0]] || 0);
+                }
+            }
+
+            const balanceValue = reduceNumber(firstLetterValues.reduce((a, b) => a + b, 0));
+            const finalSum = reduceNumber(reducedSums.reduce((a, b) => a + b, 0));
+
+            return { 
+                reducedSums, 
+                finalSum, 
+                soulValue: reduceNumber(soulValue), 
+                personalityValue: reduceNumber(personalityValue), 
+                balanceValue 
+            };
+        }
+
+        function calculateChallenges(day, month, year) {
+            const challenge1 = Math.abs(reduceNumber(day) - reduceNumber(month));
+            const challenge2 = Math.abs(reduceNumber(day) - reduceNumber(year));
+            const challenge3 = Math.abs(challenge1 - challenge2);
+            const challenge4 = Math.abs(reduceNumber(month) - reduceNumber(year));
+            return { challenge1, challenge2, challenge3, challenge4 };
+        }
+
+        function calculateChang(day, month, year) {
+            const chang1 = chang_reduceNumber(day + month);
+            const chang2 = chang_reduceNumber(day + year);
+            const chang3 = chang_reduceNumber(chang1 + chang2);
+            const chang4 = chang_reduceNumber(month + year);
+            return { chang1, chang2, chang3, chang4 };
+        }
+
+        function calculateNumerology() {
+            const name = document.getElementById('name').value;
+            const day = parseInt(document.getElementById('birthDay').value);
+            const month = parseInt(document.getElementById('birthMonth').value);
+            const year = parseInt(document.getElementById('birthYear').value);
+            const currentYear = parseInt(document.getElementById('currentYear').value);
+            const currentMonth = parseInt(document.getElementById('currentMonth').value);
+
+            const { reducedSums, finalSum, soulValue, personalityValue, balanceValue } = calculateNameValue(name);
+
+            const dayValue = reduceNumber(day);
+            const birthValue = reduceNumber(day + month + year);
+            const maturityValue = reduceNumber(birthValue + finalSum);
+            const linkValue = reduceNumber(Math.abs(birthValue - finalSum));
+            const personalYear = reduceNumber(dayValue + month + currentYear);
+            const personalMonth = reduceNumber(personalYear + currentMonth);
+
+            const { challenge1, challenge2, challenge3, challenge4 } = calculateChallenges(day, month, year);
+            const { chang1, chang2, chang3, chang4 } = calculateChang(day, month, year);
+
+            const missingNumbers = Array.from({ length: 9 }, (_, i) => i + 1).filter(num => !name.toLowerCase().split('').map(char => letterValues[char] || 0).includes(num));
+            const passion = reduceNumber(reducedSums.sort((a, b) => b - a)[0]);
+            const logicalMind = reduceNumber(reducedSums[0] + dayValue);
+
+            const results = [
+                { label: 'Đường đời', value: birthValue },
+                { label: 'Cân bằng', value: balanceValue },
+                { label: 'Sứ mệnh', value: finalSum },
+                { label: 'Liên kết', value: linkValue },
+                { label: 'Linh hồn', value: soulValue },
+                { label: 'Trưởng thành', value: maturityValue },
+                { label: 'Nhân cách', value: personalityValue },
+                { label: 'Tư duy lý trí', value: logicalMind },
+                { label: 'Ngày sinh', value: dayValue },
+                { label: 'Sức mạnh tiềm thức', value: 9 - missingNumbers.length },
+                { label: 'Đam mê', value: passion },
+                { label: 'Năm cá nhân', value: personalYear },
+                { label: 'Tháng cá nhân', value: personalMonth },
+                { label: 'Thách thức 1', value: challenge1 },
+                { label: 'Thách thức 2', value: challenge2 },
+                { label: 'Thách thức 3', value: challenge3 },
+                { label: 'Thách thức 4', value: challenge4 },
+                { label: 'Số thiếu', value: missingNumbers.join(', ') },
+                { label: 'Chặng 1', value: chang1 },
+                { label: 'Chặng 2', value: chang2 },
+                { label: 'Chặng 3', value: chang3 },
+                { label: 'Chặng 4', value: chang4 }
+            ];
+
+            document.getElementById('result').innerHTML = results
+            .map(item => `<div class="result-item"><strong>${item.label}:</strong> ${item.value}</div>`)
+            .join('');
+
+        }
+
+        window.onload = populateDateFields;
+        window.onload = () => {
+            populateDateFields();
+            populateBirthDateFields();
+        };
+    </script>
+</body>
+</html>
