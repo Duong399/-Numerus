@@ -28,16 +28,9 @@
             width: 100%;
         }
         .result {
-            margin-top: 20px;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-        }
-        .result {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* Mặc định PC: 3 cột */
             gap: 10px;
-            justify-content: center;
             margin-top: 20px;
             padding: 10px;
             background: transparent;
@@ -45,14 +38,27 @@
         }
 
         .result-item {
-            flex: 1 1 calc(22.22% - 10px);
-            min-width: 200px;
             padding: 10px;
             background: rgba(255, 255, 255, 0.2);
             border-radius: 10px;
             text-align: center;
             box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
         }
+
+        /* Mobile: 4-5 cột khi màn hình nhỏ */
+        @media (max-width: 768px) {
+            .result {
+                grid-template-columns: repeat(4, 1fr); /* 4 cột cho mobile */
+            }
+        }
+
+        /* Điện thoại nhỏ hơn: 2-3 cột */
+        @media (max-width: 480px) {
+            .result {
+                grid-template-columns: repeat(2, 1fr); /* 2 cột cho điện thoại nhỏ */
+            }
+        }
+
         .current-date-container {
             display: flex;
             gap: 10px;
@@ -60,7 +66,6 @@
             align-items: center;
             margin-top: 10px;
         }
-
         .current-date-container select {
             flex: 1;
             min-width: 100px;
@@ -80,12 +85,12 @@
             <select id="birthMonth"></select>
             <select id="birthYear"></select>
         </div>
-        <h3 style="font-size: 20px;">Nhập ngày/tháng/năm hiên tại</h3>
+        <h3 style="font-size: 20px;">Nhập ngày/tháng/năm hiện tại</h3>
         <div class="current-date-container">
             <select id="currentYear"></select>
             <select id="currentMonth"></select>
             <select id="currentDay"></select>
-        </div>        
+        </div>
         <button onclick="calculateNumerology()">Tính toán</button>
         <div class="result" id="result"></div>
     </div>
@@ -113,6 +118,7 @@
             monthSelect.value = new Date().getMonth() + 1;
             daySelect.value = new Date().getDate();
         }
+
         function populateBirthDateFields() {
             const birthYearSelect = document.getElementById('birthYear');
             const birthMonthSelect = document.getElementById('birthMonth');
@@ -146,7 +152,6 @@
             }
         }
 
-
         function reduceNumber(n) {
             while (n >= 10 && ![11, 22, 33].includes(n)) {
                 n = n.toString().split('').reduce((sum, digit) => sum + parseInt(digit), 0);
@@ -154,7 +159,16 @@
             return n;
         }
 
-        function chang_reduceNumber(n) {
+        function customReduceNumber(n) {
+            if ([11, 22, 33].includes(n)) return n;
+            while (n >= 10) {
+                n = n.toString().split('').reduce((sum, digit) => sum + parseInt(digit), 0);
+                if ([11, 22, 33].includes(n)) return n;
+            }
+            return n;
+        }
+
+        function changReduceNumber(n) {
             while (n >= 10) {
                 n = n.toString().split('').reduce((sum, digit) => sum + parseInt(digit), 0);
             }
@@ -166,6 +180,28 @@
             'j': 1, 'k': 2, 'l': 3, 'm': 4, 'n': 5, 'o': 6, 'p': 7, 'q': 8, 'r': 9,
             's': 1, 't': 2, 'u': 3, 'v': 4, 'w': 5, 'x': 6, 'y': 7, 'z': 8
         };
+        function findMostFrequentNumber(name) {
+            const counts = {};
+            const numbers = name.toLowerCase().split('').map(char => letterValues[char] || 0);
+
+            for (const num of numbers) {
+                if (num > 0) {
+                    counts[num] = (counts[num] || 0) + 1;
+                }
+            }
+
+            let maxCount = 0;
+            let mostFrequent = null;
+            for (const [num, count] of Object.entries(counts)) {
+                if (count > maxCount) {
+                    maxCount = count;
+                    mostFrequent = parseInt(num);
+                }
+            }
+
+            return mostFrequent;
+        }
+
 
         function calculateNameValue(name) {
             const nameParts = name.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").split(" ");
@@ -194,13 +230,15 @@
 
             const balanceValue = reduceNumber(firstLetterValues.reduce((a, b) => a + b, 0));
             const finalSum = reduceNumber(reducedSums.reduce((a, b) => a + b, 0));
+            const lastNameValue = nameParts.length > 0 ? reduceNumber(nameParts[nameParts.length - 1].split('').reduce((sum, char) => sum + (letterValues[char] || 0), 0)) : 0;
 
             return { 
                 reducedSums, 
                 finalSum, 
                 soulValue: reduceNumber(soulValue), 
                 personalityValue: reduceNumber(personalityValue), 
-                balanceValue 
+                balanceValue,
+                lastNameValue
             };
         }
 
@@ -213,10 +251,10 @@
         }
 
         function calculateChang(day, month, year) {
-            const chang1 = chang_reduceNumber(day + month);
-            const chang2 = chang_reduceNumber(day + year);
-            const chang3 = chang_reduceNumber(chang1 + chang2);
-            const chang4 = chang_reduceNumber(month + year);
+            const chang1 = changReduceNumber(day + month);
+            const chang2 = changReduceNumber(day + year);
+            const chang3 = changReduceNumber(chang1 + chang2);
+            const chang4 = changReduceNumber(month + year);
             return { chang1, chang2, chang3, chang4 };
         }
 
@@ -228,7 +266,7 @@
             const currentYear = parseInt(document.getElementById('currentYear').value);
             const currentMonth = parseInt(document.getElementById('currentMonth').value);
 
-            const { reducedSums, finalSum, soulValue, personalityValue, balanceValue } = calculateNameValue(name);
+            const { reducedSums, finalSum, soulValue, personalityValue, balanceValue, lastNameValue } = calculateNameValue(name);
 
             const dayValue = reduceNumber(day);
             const birthValue = reduceNumber(day + month + year);
@@ -241,16 +279,16 @@
             const { chang1, chang2, chang3, chang4 } = calculateChang(day, month, year);
 
             const missingNumbers = Array.from({ length: 9 }, (_, i) => i + 1).filter(num => !name.toLowerCase().split('').map(char => letterValues[char] || 0).includes(num));
-            const passion = reduceNumber(reducedSums.sort((a, b) => b - a)[0]);
-            const logicalMind = reduceNumber(reducedSums[0] + dayValue);
+            const passion = findMostFrequentNumber(name);
+            const logicalMind = reduceNumber(lastNameValue + dayValue);
 
             const results = [
-                { label: 'Đường đời', value: birthValue },
+                { label: 'Đường đời', value: maturityValue },
                 { label: 'Cân bằng', value: balanceValue },
                 { label: 'Sứ mệnh', value: finalSum },
                 { label: 'Liên kết', value: linkValue },
                 { label: 'Linh hồn', value: soulValue },
-                { label: 'Trưởng thành', value: maturityValue },
+                { label: 'Trưởng thành', value: birthValue },
                 { label: 'Nhân cách', value: personalityValue },
                 { label: 'Tư duy lý trí', value: logicalMind },
                 { label: 'Ngày sinh', value: dayValue },
@@ -270,12 +308,10 @@
             ];
 
             document.getElementById('result').innerHTML = results
-            .map(item => `<div class="result-item"><strong>${item.label}:</strong> ${item.value}</div>`)
-            .join('');
-
+                .map(item => `<div class="result-item"><strong>${item.label}:</strong> ${item.value}</div>`)
+                .join('');
         }
 
-        window.onload = populateDateFields;
         window.onload = () => {
             populateDateFields();
             populateBirthDateFields();
