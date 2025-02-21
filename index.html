@@ -96,6 +96,9 @@
     </div>
 
     <script>
+        function removeDiacritics(str) {
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        }
         function populateDateFields() {
             const yearSelect = document.getElementById('currentYear');
             const monthSelect = document.getElementById('currentMonth');
@@ -259,7 +262,7 @@
         }
 
         function calculateNumerology() {
-            const name = document.getElementById('name').value;
+            const name = removeDiacritics(document.getElementById('name').value);
             const day = parseInt(document.getElementById('birthDay').value);
             const month = parseInt(document.getElementById('birthMonth').value);
             const year = parseInt(document.getElementById('birthYear').value);
