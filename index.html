@@ -477,14 +477,14 @@
                     tooltip: `Bằng tên + ngày sinh:(${lastNameValue} , ${dayValue}) = ${lastNameValue + dayValue} → ${logicalMind}${[11, 22, 33].includes(logicalMind) ? ' (Số đặc biệt)' : ''}`
                 },
                 {
-                    label: 'Ngày sinh',
-                    value: dayValue,
-                    tooltip: `ngày sinh: ${day} = ${splitDigits(day)} → ${dayValue}`
-                },
-                {
                     label: 'Sức mạnh tiềm thức',
                     value: 9 - missingNumbers.length,
                     tooltip: `Sức mạnh tiềm thức bằng  9 - lượng số thiếu: ${9} - ${missingNumbers.length} → ${9 - missingNumbers.length}`
+                },
+                {
+                    label: 'Ngày sinh',
+                    value: dayValue,
+                    tooltip: `ngày sinh: ${day} = ${splitDigits(day)} → ${dayValue}`
                 },
                 {
                     label: 'Đam mê',
@@ -507,6 +507,11 @@
                     tooltip: `Bằng tổng tháng cá nhân và ngày hiện tại: ${personalMonth} + ${currentDay} → ${personalDay}`
                 },
                 {
+                    label: 'Chặng',
+                    value: `${chang1}, ${chang2}, ${chang3}, ${chang4}`,
+                    tooltip: `Chặng 1: (${day} + ${month} = ${chang1})  Chặng 2: (${day} + ${year} = ${chang2})  Chặng 3: (${chang1} + ${chang2} = ${chang3})  Chặng 4: (${month} + ${year} = ${chang4})`
+                },
+                {
                     label: 'Thách thức',
                     value: `${challenge1}, ${challenge2}, ${challenge3}, ${challenge4}`,
                     tooltip: `Thách thức 1: (${day} - ${month} = ${challenge1})  Thách thức 2: (${day} - ${year} = ${challenge2})  Thách thức 3: (${challenge1} - ${challenge2} = ${challenge3})  Thách thức 4: (${month} - ${year} = ${challenge4})`
@@ -515,11 +520,6 @@
                     label: 'Số thiếu',
                     value: missingNumbers.join(', '),
                     tooltip: `Số không có trong họ và tên: ${missingNumbers.join(', ')}`
-                },
-                {
-                    label: 'Chặng',
-                    value: `${chang1}, ${chang2}, ${chang3}, ${chang4}`,
-                    tooltip: `Chặng 1: (${day} + ${month} = ${chang1})  Chặng 2: (${day} + ${year} = ${chang2})  Chặng 3: (${chang1} + ${chang2} = ${chang3})  Chặng 4: (${month} + ${year} = ${chang4})`
                 },
             ];
 
