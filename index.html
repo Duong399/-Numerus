@@ -110,10 +110,50 @@
         <input type="text" id="name" placeholder="Nhập họ tên">
         <h2 style="font-size: 10px;">Nhập ngày/tháng/năm sinh</h2>
         <div class="current-date-container">
-            <select id="birthDay"></select>
-            <select id="birthMonth"></select>
-            <select id="birthYear"></select>
+            <input list="birthDayList" id="birthDay" placeholder="Ngày">
+            <input list="birthMonthList" id="birthMonth" placeholder="Tháng">
+            <input list="birthYearList" id="birthYear" placeholder="Năm">
+        
+            <datalist id="birthDayList"></datalist>
+            <datalist id="birthMonthList"></datalist>
+            <datalist id="birthYearList"></datalist>
         </div>
+        
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const currentYear = new Date().getFullYear();
+                const data = {
+                    birthDayList: [1, 31],
+                    birthMonthList: [1, 12],
+                    birthYearList: [1900, currentYear]
+                };
+        
+                Object.entries(data).forEach(([id, range]) => {
+                    document.getElementById(id).innerHTML = Array.from(
+                        { length: range[1] - range[0] + 1 },
+                        (_, i) => `<option value="${i + range[0]}"></option>`
+                    ).join('');
+                });
+            });
+        </script>
+        
+        <style>
+            .current-date-container {
+                display: flex;
+                gap: 10px;
+                justify-content: center;
+                align-items: center;
+                margin-top: 10px;
+            }
+        
+            .current-date-container input {
+                flex: 1;
+                min-width: 100px;
+                padding: 10px;
+                border-radius: 10px;
+                text-align: center;
+            }
+        </style>
         <h3 style="font-size: 10px;">Nhập ngày/tháng/năm hiện tại</h3>
         <div class="current-date-container">
             <select id="currentYear"></select>
