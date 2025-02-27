@@ -73,19 +73,48 @@
             border-radius: 10px;
             text-align: center;
         }
+        /* Tooltip để hiển thị khi di chuột */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 250px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+            position: absolute;
+            z-index: 100;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Numerology Calculator</h1>
         <input type="text" id="name" placeholder="Nhập họ tên">
-        <h2 style="font-size: 20px;">Nhập ngày/tháng/năm sinh</h2>
+        <h2 style="font-size: 10px;">Nhập ngày/tháng/năm sinh</h2>
         <div class="current-date-container">
             <select id="birthDay"></select>
             <select id="birthMonth"></select>
             <select id="birthYear"></select>
         </div>
-        <h3 style="font-size: 20px;">Nhập ngày/tháng/năm hiện tại</h3>
+        <h3 style="font-size: 10px;">Nhập ngày/tháng/năm hiện tại</h3>
         <div class="current-date-container">
             <select id="currentYear"></select>
             <select id="currentMonth"></select>
@@ -99,6 +128,7 @@
         function removeDiacritics(str) {
             return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
         }
+
         function populateDateFields() {
             const yearSelect = document.getElementById('currentYear');
             const monthSelect = document.getElementById('currentMonth');
@@ -121,6 +151,18 @@
             monthSelect.value = new Date().getMonth() + 1;
             daySelect.value = new Date().getDate();
         }
+        function calculateMissingNumbers(name) {
+            const counts = Array(9).fill(0);
+            name.toLowerCase().split('').forEach(char => {
+                const num = letterValues[char] || 0;
+                if (num > 0) counts[num - 1]++;  // Đếm số lần xuất hiện
+            });
+
+            // Tìm các số từ 1 đến 9 mà không xuất hiện
+            const missing = counts.map((count, index) => (count === 0 ? index + 1 : null)).filter(n => n !== null);
+            return missing;
+        }
+
 
         function populateBirthDateFields() {
             const birthYearSelect = document.getElementById('birthYear');
@@ -171,6 +213,7 @@
             return n;
         }
 
+
         function changReduceNumber(n) {
             while (n >= 10) {
                 n = n.toString().split('').reduce((sum, digit) => sum + parseInt(digit), 0);
@@ -205,51 +248,89 @@
             return mostFrequent;
         }
 
-
         function calculateNameValue(name) {
             const nameParts = name.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").split(" ");
-            let soulValue = 0, personalityValue = 0;
             const vowels = "aeiou";
 
+            let soulValue = 0;
+            let personalityValue = 0;
+            let totalSoulSum = 0;
+            let soulDetails = [];  // 🔥 Lưu các nguyên âm + số tương ứng
+            let balanceDetails = []; // 🔥 Lưu chữ cái đầu + số tương ứng
             const reducedSums = [];
             const firstLetterValues = [];
+            let nameValue = 0;
+
+            for (const char of name) {
+                nameValue += letterValues[char] || 0;
+            }
+            let personalityDetails = [];
 
             for (const part of nameParts) {
+                for (const char of part) {
+                    if (!vowels.includes(char)) {
+                        const value = letterValues[char] || 0;
+                        personalityDetails.push(`${char}:${value}`);
+                    }
+                }
+            }
+            for (const part of nameParts) {
                 let totalSum = 0;
+                let soulSum = 0;
+
                 for (const char of part) {
                     const value = letterValues[char] || 0;
                     totalSum += value;
                     if (vowels.includes(char)) {
-                        soulValue += value;
+                        soulSum += value;
+                        soulDetails.push(`${char}:${value}`);  // 🔥 Lưu chi tiết nguyên âm
                     } else {
                         personalityValue += value;
                     }
                 }
+
+                totalSoulSum += soulSum;
                 reducedSums.push(reduceNumber(totalSum));
+                soulValue += reduceNumber(soulSum);
+
                 if (part.length > 0) {
-                    firstLetterValues.push(letterValues[part[0]] || 0);
+                    let firstChar = part[0];  // 🔥 Lấy chữ cái đầu tiên
+                    let firstCharValue = letterValues[firstChar] || 0;
+                    firstLetterValues.push(firstCharValue);
+                    balanceDetails.push(`${firstChar}:${firstCharValue}`);  // 🔥 Lưu chi tiết chữ cái đầu
                 }
             }
 
-            const balanceValue = reduceNumber(firstLetterValues.reduce((a, b) => a + b, 0));
+            const balanceSum = firstLetterValues.reduce((a, b) => a + b, 0);
+            const balanceValue = changReduceNumber(balanceSum);
             const finalSum = reduceNumber(reducedSums.reduce((a, b) => a + b, 0));
             const lastNameValue = nameParts.length > 0 ? reduceNumber(nameParts[nameParts.length - 1].split('').reduce((sum, char) => sum + (letterValues[char] || 0), 0)) : 0;
 
-            return { 
-                reducedSums, 
-                finalSum, 
-                soulValue: reduceNumber(soulValue), 
-                personalityValue: reduceNumber(personalityValue), 
-                balanceValue,
-                lastNameValue
+            return {
+                reducedSums,
+                finalSum,
+                soulSum: totalSoulSum,
+                soulValue, 
+                soulDetails,  // 🔥 Trả về danh sách nguyên âm
+                balanceSum,
+                balanceValue, 
+                balanceDetails,  // 🔥 Trả về danh sách chữ cái đầu
+                personalityValue: reduceNumber(personalityValue),
+                personalityDetails,
+                lastNameValue,
+                nameValue
             };
         }
 
+
+
+
+
         function calculateChallenges(day, month, year) {
-            const challenge1 = Math.abs(reduceNumber(day) - reduceNumber(month));
-            const challenge2 = Math.abs(reduceNumber(day) - reduceNumber(year));
+            const challenge1 = Math.abs(reduceNumber(day) - changReduceNumber(month));
+            const challenge2 = Math.abs(reduceNumber(day) - changReduceNumber(year));
             const challenge3 = Math.abs(challenge1 - challenge2);
-            const challenge4 = Math.abs(reduceNumber(month) - reduceNumber(year));
+            const challenge4 = Math.abs(changReduceNumber(month) - changReduceNumber(year));
             return { challenge1, challenge2, challenge3, challenge4 };
         }
 
@@ -260,6 +341,23 @@
             const chang4 = changReduceNumber(month + year);
             return { chang1, chang2, chang3, chang4 };
         }
+        function charToNumber(char) {
+            if (!/[a-zA-Z]/.test(char)) return 0;  // Chỉ xử lý ký tự chữ
+            const alphabet = 'abcdefghijklmnopqrstuvwxyz';
+            const index = alphabet.indexOf(char.toLowerCase());
+            return index !== -1 ? (index % 9) + 1 : 0;
+        }
+        function calculateBirthValue(day, month, year) {
+            const sum = reduceNumber(day) + reduceNumber(month) + reduceNumber(year);
+            if ([11, 22, 33].includes(sum)) {
+                return sum;  // Giữ số đặc biệt nếu có
+            }
+            return reduceNumber(sum);  // Giảm về 1 chữ số nếu không phải số đặc biệt
+        }
+        function splitDigits(num) {
+            return num.toString().split("").join(" + ");
+        }
+
 
         function calculateNumerology() {
             const name = removeDiacritics(document.getElementById('name').value);
@@ -268,13 +366,21 @@
             const year = parseInt(document.getElementById('birthYear').value);
             const currentYear = parseInt(document.getElementById('currentYear').value);
             const currentMonth = parseInt(document.getElementById('currentMonth').value);
+            
 
-            const { reducedSums, finalSum, soulValue, personalityValue, balanceValue, lastNameValue } = calculateNameValue(name);
+            const { reducedSums, finalSum, soulValue, soulSum, soulDetails, personalityValue, personalityDetails, balanceValue, balanceSum, balanceDetails, lastNameValue, nameValue } = calculateNameValue(name);
+
+
 
             const dayValue = reduceNumber(day);
-            const birthValue = reduceNumber(day + month + year);
+            const birthValue = calculateBirthValue(day, month, year);
+
             const maturityValue = reduceNumber(birthValue + finalSum);
-            const linkValue = reduceNumber(Math.abs(birthValue - finalSum));
+
+            const linkValue = birthValue > finalSum 
+                ? reduceNumber(Math.abs(changReduceNumber(birthValue) - finalSum)) 
+                : reduceNumber(Math.abs(finalSum - changReduceNumber(birthValue)));
+
             const personalYear = reduceNumber(dayValue + month + currentYear);
             const personalMonth = reduceNumber(personalYear + currentMonth);
 
@@ -283,36 +389,103 @@
 
             const missingNumbers = Array.from({ length: 9 }, (_, i) => i + 1).filter(num => !name.toLowerCase().split('').map(char => letterValues[char] || 0).includes(num));
             const passion = findMostFrequentNumber(name);
-            const logicalMind = reduceNumber(lastNameValue + dayValue);
-
+            const logicalMind = changReduceNumber(lastNameValue + dayValue);
+            
             const results = [
-                { label: 'Đường đời', value: maturityValue },
-                { label: 'Cân bằng', value: balanceValue },
-                { label: 'Sứ mệnh', value: finalSum },
-                { label: 'Liên kết', value: linkValue },
-                { label: 'Linh hồn', value: soulValue },
-                { label: 'Trưởng thành', value: birthValue },
-                { label: 'Nhân cách', value: personalityValue },
-                { label: 'Tư duy lý trí', value: logicalMind },
-                { label: 'Ngày sinh', value: dayValue },
-                { label: 'Sức mạnh tiềm thức', value: 9 - missingNumbers.length },
-                { label: 'Đam mê', value: passion },
-                { label: 'Năm cá nhân', value: personalYear },
-                { label: 'Tháng cá nhân', value: personalMonth },
-                { label: 'Thách thức 1', value: challenge1 },
-                { label: 'Thách thức 2', value: challenge2 },
-                { label: 'Thách thức 3', value: challenge3 },
-                { label: 'Thách thức 4', value: challenge4 },
-                { label: 'Số thiếu', value: missingNumbers.join(', ') },
-                { label: 'Chặng 1', value: chang1 },
-                { label: 'Chặng 2', value: chang2 },
-                { label: 'Chặng 3', value: chang3 },
-                { label: 'Chặng 4', value: chang4 }
+                { 
+                    label: 'Đường đời', 
+                    value: birthValue,
+                    tooltip: `Bằng tổng ngày tháng năm sinh:(${day}+${month}+${year}) → ${reduceNumber(day)}+${reduceNumber(month)}+${reduceNumber(year)} = ${birthValue}${[11, 22, 33].includes(birthValue) ? ' (Số đặc biệt)' : ''}`
+                },
+                {
+                    label: 'Cân bằng',
+                    value: balanceValue,
+                    tooltip: `Bằng tổng các chữ cái đầu của Họ và tên:(${balanceDetails.join(" + ")}) = ${balanceSum} → ${balanceValue}${[11, 22, 33].includes(balanceValue) ? ' (Số đặc biệt)' : ''}`
+                },
+                {
+                    label: 'Sứ mệnh',
+                    value: finalSum,
+                    tooltip: `Bằng tổng họ và tên: ${name} → ${[...name].map(char => `${char}: ${charToNumber(char)}`).join(' + ')} → Tổng = ${nameValue} → ${reduceNumber(nameValue)}${[11, 22, 33].includes(finalSum) ? ' (Số đặc biệt)' : ''}`
+                },
+                {
+                    label: 'Liên kết', 
+                    value: linkValue,
+                    tooltip: birthValue > finalSum 
+                        ? `Bằng hiệu đường đời và sứ mệnh:${changReduceNumber(birthValue)} - ${finalSum} → ${linkValue}${[11, 22, 33].includes(linkValue) ? ' (Số đặc biệt)' : ''}`
+                        : `Bằng hiệu sứ mệnh và đường đời:${finalSum} - ${changReduceNumber(birthValue)} → ${linkValue}${[11, 22, 33].includes(linkValue) ? ' (Số đặc biệt)' : ''}`
+                },
+                {
+                    label: 'Linh hồn', 
+                    value: reduceNumber(soulValue),
+                    tooltip: `(${soulDetails.join(" + ")}) = ${soulSum} → ${reduceNumber(soulValue)}${[11, 22, 33].includes(reduceNumber(soulValue)) ? ' (Số đặc biệt)' : ''}`
+                },
+                {
+                    label: 'Trưởng thành',
+                    value: maturityValue,
+                    tooltip: `Bằng đường đời + sứ mệnh:(${birthValue} + ${finalSum}) = ${birthValue + finalSum} → ${maturityValue}${[11, 22, 33].includes(maturityValue) ? ' (Số đặc biệt)' : ''}`
+                },
+                {
+                    label: 'Nhân cách',
+                    value: personalityValue,
+                    tooltip: `Bằng tổng các phụ âm ${personalityDetails.join(" + ")} = ${personalityValue}${[11, 22, 33].includes(personalityValue) ? ' (Số đặc biệt)' : ''}`
+                },
+                {
+                    label: 'Tư duy lý trí',
+                    value: logicalMind,
+                    tooltip: `Bằng tên + ngày sinh:(${lastNameValue} , ${dayValue}) = ${lastNameValue + dayValue} → ${logicalMind}${[11, 22, 33].includes(logicalMind) ? ' (Số đặc biệt)' : ''}`
+                },
+                {
+                    label: 'Ngày sinh',
+                    value: dayValue,
+                    tooltip: `ngày sinh: ${day} = ${splitDigits(day)} → ${dayValue}`
+                },
+                {
+                    label: 'Sức mạnh tiềm thức',
+                    value: 9 - missingNumbers.length,
+                    tooltip: `Sức mạnh tiềm thức bằng  9 - lượng số thiếu: ${9} - ${missingNumbers.length} → ${9 - missingNumbers.length}`
+                },
+                {
+                    label: 'Đam mê',
+                    value: passion,
+                    tooltip: `Số hiển thị nhiều nhất trong họ và tên: ${passion}`
+                },
+                {
+                    label: 'Năm cá nhân',
+                    value: personalYear,
+                    tooltip: `ngày sinh + tháng sinh + năm hiện tại: ${dayValue} + ${month} +${currentYear} → ${personalYear}`
+                },
+                {
+                    label: 'Tháng cá nhân',
+                    value: personalMonth,
+                    tooltip: `Bằng tổng năm cá nhân và tháng hiện tại: ${personalYear} + ${currentMonth} → ${personalMonth}`
+                },
+                {
+                    label: 'Thách thức',
+                    value: `${challenge1}, ${challenge2}, ${challenge3}, ${challenge4}`,
+                    tooltip: `Thách thức 1: (${day} - ${month} = ${challenge1})  Thách thức 2: (${day} - ${year} = ${challenge2})  Thách thức 3: (${challenge1} - ${challenge2} = ${challenge3})  Thách thức 4: (${month} - ${year} = ${challenge4})`
+                },
+                {
+                    label: 'Số thiếu',
+                    value: missingNumbers.join(', '),
+                    tooltip: `Số không có trong họ và tên: ${missingNumbers.join(', ')}`
+                },
+                {
+                    label: 'Chặng',
+                    value: `${chang1}, ${chang2}, ${chang3}, ${chang4}`,
+                    tooltip: `Chặng 1: (${day} + ${month} = ${chang1})  Chặng 2: (${day} + ${year} = ${chang2})  Chặng 3: (${chang1} + ${chang2} = ${chang3})  Chặng 4: (${month} + ${year} = ${chang4})`
+                },
             ];
 
             document.getElementById('result').innerHTML = results
-                .map(item => `<div class="result-item"><strong>${item.label}:</strong> ${item.value}</div>`)
+                .map(item => {
+                    const tooltip = item.tooltip ? `<div class="tooltip-text">${item.tooltip}</div>` : '';
+                    return `<div class="result-item tooltip">
+                                <strong>${item.label}:</strong> ${item.value}
+                                ${tooltip}
+                            </div>`;
+                })
                 .join('');
+
         }
 
         window.onload = () => {
