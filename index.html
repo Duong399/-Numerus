@@ -55,7 +55,7 @@
         /* Điện thoại nhỏ hơn: 2-3 cột */
         @media (max-width: 480px) {
             .result {
-                grid-template-columns: repeat(2, 1fr); /* 2 cột cho điện thoại nhỏ */
+                grid-template-columns: repeat(4, 1fr); /* 2 cột cho điện thoại nhỏ */
             }
         }
 
@@ -406,6 +406,7 @@
             const year = parseInt(document.getElementById('birthYear').value);
             const currentYear = parseInt(document.getElementById('currentYear').value);
             const currentMonth = parseInt(document.getElementById('currentMonth').value);
+            const currentDay = parseInt(document.getElementById('currentDay').value);
             
 
             const { reducedSums, finalSum, soulValue, soulSum, soulDetails, personalityValue, personalityDetails, balanceValue, balanceSum, balanceDetails, lastNameValue, nameValue } = calculateNameValue(name);
@@ -423,6 +424,7 @@
 
             const personalYear = reduceNumber(dayValue + month + currentYear);
             const personalMonth = reduceNumber(personalYear + currentMonth);
+            const personalDay = reduceNumber(personalMonth + currentDay);
 
             const { challenge1, challenge2, challenge3, challenge4 } = calculateChallenges(day, month, year);
             const { chang1, chang2, chang3, chang4 } = calculateChang(day, month, year);
@@ -498,6 +500,11 @@
                     label: 'Tháng cá nhân',
                     value: personalMonth,
                     tooltip: `Bằng tổng năm cá nhân và tháng hiện tại: ${personalYear} + ${currentMonth} → ${personalMonth}`
+                },
+                {
+                    label: 'Ngày cá nhân',
+                    value: personalDay,
+                    tooltip: `Bằng tổng tháng cá nhân và ngày hiện tại: ${personalMonth} + ${currentDay} → ${personalDay}`
                 },
                 {
                     label: 'Thách thức',
