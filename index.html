@@ -432,7 +432,15 @@
             const missingNumbers = Array.from({ length: 9 }, (_, i) => i + 1).filter(num => !name.toLowerCase().split('').map(char => letterValues[char] || 0).includes(num));
             const passion = findMostFrequentNumber(name);
             const logicalMind = changReduceNumber(lastNameValue + dayValue);
-            
+            const age1 = 36 - changReduceNumber(birthValue);
+            const age2 = age1 + 9;
+            const age3 = age2 + 9;
+            const age4 = age3 + 9;
+            const cyear1 = year + age1;
+            const cyear2 = cyear1 + 9;
+            const cyear3 = cyear2 + 9;
+            const cyear4 = cyear3 + 9;
+
             const results = [
                 { 
                     label: 'Đường đời', 
@@ -509,12 +517,86 @@
                 {
                     label: 'Chặng',
                     value: `${chang1}, ${chang2}, ${chang3}, ${chang4}`,
-                    tooltip: `Chặng 1: (${day} + ${month} = ${chang1})  Chặng 2: (${day} + ${year} = ${chang2})  Chặng 3: (${chang1} + ${chang2} = ${chang3})  Chặng 4: (${month} + ${year} = ${chang4})`
+                    tooltip: `
+                        <p><strong>Chi tiết tính toán:</strong></p>
+                        <p>Chặng 1: (${day} + ${month} = ${chang1})</p>
+                        <p>Chặng 2: (${day} + ${year} = ${chang2})</p>
+                        <p>Chặng 3: (${chang1} + ${chang2} = ${chang3})</p>
+                        <p>Chặng 4: (${month} + ${year} = ${chang4})</p>
+                        
+                        <table border="1" cellspacing="0" cellpadding="5">
+                            <tr>
+                                <th>Chặng</th>
+                                <td>${chang1}</td>
+                                <td>${chang2}</td>
+                                <td>${chang3}</td>
+                                <td>${chang4}</td>
+                            </tr>
+                            <tr>
+                                <th>Thách thức</th>
+                                <td>${challenge1}</td>
+                                <td>${challenge2}</td>
+                                <td>${challenge3}</td>
+                                <td>${challenge4}</td>
+                            </tr>
+                            <tr>
+                                <th>Tuổi</th>
+                                <td>0 - ${age1}</td>
+                                <td>${age1 + 1} - ${age2}</td>
+                                <td>${age2 + 1} - ${age3}</td>
+                                <td>${age3 + 1} - ${age4}</td>
+                            </tr>
+                            <tr>
+                                <th>Năm</th>
+                                <td>${year} - ${cyear1}</td>
+                                <td>${cyear1 + 1} - ${cyear2}</td>
+                                <td>${cyear2 + 1} - ${cyear3}</td>
+                                <td>${cyear3 + 1} - ${cyear4}</td>
+                            </tr>
+                        </table>
+                    `
                 },
                 {
                     label: 'Thách thức',
                     value: `${challenge1}, ${challenge2}, ${challenge3}, ${challenge4}`,
-                    tooltip: `Thách thức 1: (${day} - ${month} = ${challenge1})  Thách thức 2: (${day} - ${year} = ${challenge2})  Thách thức 3: (${challenge1} - ${challenge2} = ${challenge3})  Thách thức 4: (${month} - ${year} = ${challenge4})`
+                    tooltip: `
+                        <p><strong>Chi tiết tính toán:</strong></p>
+                        <p>Thách thức 1: (${day} - ${month} = ${challenge1})</p>
+                        <p>Thách thức 2: (${day} - ${year} = ${challenge2})</p>
+                        <p>Thách thức 3: (${challenge1} - ${challenge2} = ${challenge3})</p>
+                        <p>Thách thức 4: (${month} - ${year} = ${challenge4})</p>
+
+                        <table border="1" cellspacing="0" cellpadding="5">
+                            <tr>
+                                <th>Chặng</th>
+                                <td>${chang1}</td>
+                                <td>${chang2}</td>
+                                <td>${chang3}</td>
+                                <td>${chang4}</td>
+                            </tr>
+                            <tr>
+                                <th>Thách thức</th>
+                                <td>${challenge1}</td>
+                                <td>${challenge2}</td>
+                                <td>${challenge3}</td>
+                                <td>${challenge4}</td>
+                            </tr>
+                            <tr>
+                                <th>Tuổi</th>
+                                <td>0 - ${age1}</td>
+                                <td>${age1 + 1} - ${age2}</td>
+                                <td>${age2 + 1} - ${age3}</td>
+                                <td>${age3 + 1} - ${age4}</td>
+                            </tr>
+                            <tr>
+                                <th>Năm</th>
+                                <td>${year} - ${cyear1}</td>
+                                <td>${cyear1 + 1} - ${cyear2}</td>
+                                <td>${cyear2 + 1} - ${cyear3}</td>
+                                <td>${cyear3 + 1} - ${cyear4}</td>
+                            </tr>
+                        </table>
+                    `
                 },
                 {
                     label: 'Số thiếu',
