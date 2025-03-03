@@ -101,6 +101,123 @@
             visibility: visible;
             opacity: 1;
         }
+        /* Nút hỏi đáp */
+        #chat-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #c064e1;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        #chat-button:hover {
+            background-color: #efefef;
+        }
+
+        /* Khung chat */
+        #chat-box {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            width: 300px;
+            height: 400px;
+            background-color: rgb(205, 96, 241);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        #chat-header {
+            background-color: #cd72e6;
+            color: white;
+            padding: 10px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #close-chat {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            position: absolute;
+        }
+
+        #chat-body {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+
+        #chat-messages {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message {
+            padding: 8px 12px;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+
+        .message.user {
+            background-color: #c47bf8;
+            color: white;
+            align-self: flex-end;
+        }
+
+        .message.bot {
+            background-color: #e1e1e1;
+            color: black;
+            align-self: flex-start;
+        }
+
+        #chat-input-container {
+            display: flex;
+            padding: 10px;
+            background-color: #fff;
+            border-top: 1px solid #ddd;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        #chat-input {
+            flex: 1;
+            padding: 12px; /* Tăng padding để ô nhập to hơn */
+            font-size: 16px; /* Tăng kích thước chữ */
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        #send-button {
+            margin-left: 10px;
+            padding: 8px 12px; /* Giảm padding để nút nhỏ hơn */
+            font-size: 14px; /* Giảm kích thước chữ */
+            background-color: #b37aef;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 60px; /* Cố định chiều rộng của nút */
+        }
+
+        #send-button:hover {
+            background-color: #f7f7f7;
+        }
 
     </style>
 </head>
@@ -118,7 +235,23 @@
             <datalist id="birthMonthList"></datalist>
             <datalist id="birthYearList"></datalist>
         </div>
-        
+        <!-- Nút hỏi đáp -->
+        <div id="chat-button" onclick="toggleChat()">💬 Hỏi đáp</div>
+
+        <!-- Khung chat -->
+        <div id="chat-box">
+            <div id="chat-header">
+                <span>Hỏi đáp về Thần số học</span>
+                <button id="close-chat" onclick="toggleChat()">×</button>
+            </div>
+            <div id="chat-body">
+                <div id="chat-messages"></div>
+            </div>
+            <div id="chat-input-container">
+                <input type="text" id="chat-input" placeholder="Nhập câu hỏi của bạn..." onkeypress="handleChatInput(event)">
+                <button id="send-button" onclick="sendMessage()">Gửi</button>
+            </div>
+        </div>
         <script>
             document.addEventListener("DOMContentLoaded", () => {
                 const currentYear = new Date().getFullYear();
@@ -165,6 +298,94 @@
     </div>
 
     <script>
+        let numerologyResults = null; // Biến toàn cục để lưu kết quả
+        // API Key của Cohere (thay thế bằng API Key của bạn)
+        const COHERE_API_KEY = "9MHD0XvvmkJQGfQpogAmNw6ozsZalaZa57OVFMPE"; // Thay YOUR_COHERE_API_KEY bằng API Key thực tế
+
+        // Hiển thị/ẩn khung chat
+        function toggleChat() {
+            const chatBox = document.getElementById('chat-box');
+            chatBox.style.display = chatBox.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        // Xử lý nhập liệu từ người dùng
+        function handleChatInput(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Gửi tin nhắn
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (message === '') return;
+
+            // Hiển thị tin nhắn của người dùng
+            displayMessage(message, 'user');
+
+            // Gọi API Cohere để nhận phản hồi
+            const response = await getCohereResponse(message);
+            displayMessage(response, 'bot');
+
+            // Xóa nội dung input
+            input.value = '';
+        }
+
+        // Hiển thị tin nhắn
+        function displayMessage(message, sender) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', sender);
+            messageElement.textContent = message;
+            chatMessages.appendChild(messageElement);
+
+            // Cuộn xuống dưới cùng
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Gọi API Cohere để nhận phản hồi
+        async function getCohereResponse(message) {
+            if (!numerologyResults) {
+                return "Vui lòng tính toán các chỉ số trước khi hỏi.";
+            }
+
+            // Thêm hướng dẫn rõ ràng để AI trả lời bằng tiếng Việt
+            const context = `Bạn là một chuyên gia Numerology. Hãy trả lời câu hỏi sau bằng tiếng Việt một cách ngắn gọn và dễ hiểu. Các chỉ số Numerology của bạn là: 
+            - Đường đời: ${numerologyResults.birthValue}
+            - Cân bằng: ${numerologyResults.balanceValue}
+            - Sứ mệnh: ${numerologyResults.finalSum}
+            - Linh hồn: ${numerologyResults.soulValue}
+            - Nhân cách: ${numerologyResults.personalityValue}
+            - Năm cá nhân: ${numerologyResults.personalYear}
+            Câu hỏi: ${message}`;
+
+            const url = "https://api.cohere.com/v1/chat";
+            const data = {
+                model: "command-r-plus",
+                message: context,
+                temperature: 0.7,
+                max_tokens: 500,
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${COHERE_API_KEY}`,
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                const result = await response.json();
+                console.log(result);
+                return result.text;
+            } catch (error) {
+                console.error("Lỗi khi gọi API Cohere:", error);
+                return "Xin lỗi, tôi không thể kết nối đến AI ngay lúc này.";
+            }
+        }
         function removeDiacritics(str) {
             return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
         }
@@ -367,10 +588,10 @@
 
 
         function calculateChallenges(day, month, year) {
-            const challenge1 = Math.abs(reduceNumber(day) - changReduceNumber(month));
-            const challenge2 = Math.abs(reduceNumber(day) - changReduceNumber(year));
-            const challenge3 = Math.abs(challenge1 - challenge2);
-            const challenge4 = Math.abs(changReduceNumber(month) - changReduceNumber(year));
+            const challenge1 = changReduceNumber(Math.abs(reduceNumber(day) - changReduceNumber(month)));
+            const challenge2 = changReduceNumber(Math.abs(reduceNumber(day) - changReduceNumber(year)));
+            const challenge3 = changReduceNumber(Math.abs(challenge1 - challenge2));
+            const challenge4 = changReduceNumber(Math.abs(changReduceNumber(month) - changReduceNumber(year)));
             return { challenge1, challenge2, challenge3, challenge4 };
         }
 
@@ -440,6 +661,30 @@
             const cyear2 = cyear1 + 9;
             const cyear3 = cyear2 + 9;
             const cyear4 = cyear3 + 9;
+            // Lưu kết quả vào biến toàn cục
+            numerologyResults = {
+                birthValue,
+                balanceValue,
+                finalSum,
+                linkValue,
+                soulValue,
+                maturityValue,
+                personalityValue,
+                logicalMind,
+                missingNumbers,
+                passion,
+                personalYear,
+                personalMonth,
+                personalDay,
+                chang1,
+                chang2,
+                chang3,
+                chang4,
+                challenge1,
+                challenge2,
+                challenge3,
+                challenge4,
+            };
 
             const results = [
                 { 
