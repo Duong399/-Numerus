@@ -73,7 +73,6 @@
             border-radius: 10px;
             text-align: center;
         }
-        /* Tooltip để hiển thị khi di chuột */
         .tooltip {
             position: relative;
             display: inline-block;
@@ -196,8 +195,8 @@
 
         #chat-input {
             flex: 1;
-            padding: 12px; /* Tăng padding để ô nhập to hơn */
-            font-size: 16px; /* Tăng kích thước chữ */
+            padding: 12px;
+            font-size: 16px;
             border: 1px solid #ddd;
             border-radius: 5px;
             outline: none;
@@ -205,18 +204,60 @@
 
         #send-button {
             margin-left: 10px;
-            padding: 8px 12px; /* Giảm padding để nút nhỏ hơn */
-            font-size: 14px; /* Giảm kích thước chữ */
+            padding: 8px 12px;
+            font-size: 14px;
             background-color: #b37aef;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            width: 60px; /* Cố định chiều rộng của nút */
+            width: 60px;
         }
 
         #send-button:hover {
             background-color: #f7f7f7;
+        }
+        /* Nút Messenger */
+        #messenger-button {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background-color: #ffffff;
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        #messenger-button:hover {
+            background-color: #ad65e5;
+        }
+        /* Nút zalo */
+        #zalo-button {
+            position: fixed;
+            bottom: 140px;
+            right: 20px;
+            background-color: #ffffff;
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        #zalo-button:hover {
+            background-color: #ad65e5;
         }
 
     </style>
@@ -235,6 +276,14 @@
             <datalist id="birthMonthList"></datalist>
             <datalist id="birthYearList"></datalist>
         </div>
+        <!-- Nút zalo -->
+        <a id="zalo-button" href="https://zalo.me/0778305689" target="_blank">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/1200px-Icon_of_Zalo.svg.png" alt="zalo" style="width: 24px; height: 24px;">
+        </a>
+        <!-- Nút Messenger -->
+        <a id="messenger-button" href="https://www.facebook.com/ThinhnguyenEDA" target="_blank">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Facebook_Messenger_logo_2020.svg/1024px-Facebook_Messenger_logo_2020.svg.png" alt="Messenger" style="width: 24px; height: 24px;">
+        </a>
         <!-- Nút hỏi đáp -->
         <div id="chat-button" onclick="toggleChat()">💬 Hỏi đáp</div>
 
