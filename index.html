@@ -371,26 +371,37 @@
             justify-content: center;
         }
 
+        /* Phần kim tự tháp mới */
         .pyramid {
-            display: grid;
-            grid-template-columns: repeat(9, 1fr);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             gap: 10px;
             margin: 20px 0;
         }
-
+        
+        .pyramid-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        
         .pyramid-cell {
-            aspect-ratio: 1;
+            width: 30px;
+            height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 50%;
             font-weight: bold;
+            font-size: 12px;
             transition: all 0.3s ease;
         }
-
+        
         .pyramid-cell.active {
             background: rgba(138, 43, 226, 0.6);
+            transform: scale(1.1);
         }
 
         @keyframes fadeIn {
@@ -1327,38 +1338,56 @@
             container.innerHTML = svgContent;
         }
 
-        // Tạo kim tự tháp số học
         function createNumberPyramid() {
             const pyramidContainer = document.getElementById('number-pyramid');
+            const day = parseInt(document.getElementById('birthDay').value);
+            const month = parseInt(document.getElementById('birthMonth').value);
+            const year = parseInt(document.getElementById('birthYear').value);
+            const { challenge1, challenge2, challenge3, challenge4 } = calculateChallenges(day, month, year);
+            const { chang1, chang2, chang3, chang4 } = calculateChang(day, month, year);
             pyramidContainer.innerHTML = '';
-            
-            // Tạo 9 ô cho các số từ 1-9
-            for (let i = 1; i <= 9; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'pyramid-cell';
-                cell.textContent = i;
-                
-                // Kiểm tra xem số có trong tên không
-                const name = document.getElementById('name').value.toLowerCase();
-                const numberAppears = name.split('').some(char => {
-                    const charValue = letterValues[char] || 0;
-                    return charValue === i;
+
+            // Tạo các hàng của kim tự tháp
+            const pyramidRows = [
+                [challenge1],
+                [challenge2],
+                [challenge3, challenge4],
+                [day, month,year],
+                [chang3, chang4],
+                [chang2],
+                [chang1],
+            ];
+
+            // Tạo kim tự tháp
+            pyramidRows.forEach(row => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'pyramid-row';
+
+                row.forEach(num => {
+                    const cell = document.createElement('div');
+                    cell.className = 'pyramid-cell';
+                    cell.textContent = num;
+                    rowDiv.appendChild(cell);
                 });
-                
-                if (numberAppears) {
-                    cell.classList.add('active');
-                }
-                
-                pyramidContainer.appendChild(cell);
-            }
-            
+
+                pyramidContainer.appendChild(rowDiv);
+            });
+
             // Thêm mô tả kim tự tháp
             document.getElementById('pyramid-description').innerHTML = `
-                <p>Kim tự tháp số học thể hiện các số hiện diện trong tên của bạn. Các số sáng là các số có mặt trong tên, các số mờ là các số thiếu.</p>
-                <p>Số thiếu: ${numerologyResults.missingNumbers.join(', ')}</p>
-                <p>Sức mạnh tiềm thức: ${9 - numerologyResults.missingNumbers.length}/9</p>
+                <p><strong>Kim tự tháp cho thấy 4 giai đoạn trong cuộc đời bạn sẽ tương ứng với đỉnh cao là số nào và thử thách là con số nào, tức là bạn nên tập trung phát triển số nào trong những năm này để đạt được nhiều thành công và hạnh phúc nhất.</strong></p>
+                <p>Từ tuổi đỉnh cao đầu tiên đến tuổi đỉnh cao cuối cùng (36 năm) chính là khoảng thời gian gặt hái nhiều thành công trong cuộc đời của bạn.</p>
+                <p><strong>Mức độ thành tựu trong 4 giai đoạn được thể hiện khác nhau:</strong></p>
+                <ul>
+                    <li><strong>Giai đoạn 1</strong> - Đỉnh cao của tuổi trẻ, thành tựu thường lớn đối với bản thân và suy nghĩ của bạn.</li>
+                    <li><strong>Giai đoạn 2</strong> - Đỉnh cao của kinh nghiệm, thành tựu thường lớn hơn giai đoạn 1 và có thể ảnh hưởng nhỏ tới xã hội.</li>
+                    <li><strong>Giai đoạn 3 và giai đoạn 4</strong> - Đỉnh cao của sự trưởng thành, thành tựu có thể rất lớn và ảnh hưởng tới xã hội, môi trường xung quanh.</li>
+                </ul>
+                <p>Tuy vậy, trong 4 giai đoạn này cũng sẽ có những thách thức cụ thể mà cuộc đời muốn bạn vượt qua – những con số thử thách sẽ nói lên điều đó.</p>
             `;
         }
+
+
 
         // Điền nội dung cho modal chi tiết
         async function populateDetailedView() {
