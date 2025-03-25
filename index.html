@@ -953,9 +953,9 @@
                 ? reduceNumber(Math.abs(changReduceNumber(birthValue) - finalSum)) 
                 : reduceNumber(Math.abs(finalSum - changReduceNumber(birthValue)));
 
-            const personalYear = reduceNumber(dayValue + month + currentYear);
-            const personalMonth = reduceNumber(personalYear + currentMonth);
-            const personalDay = reduceNumber(personalMonth + currentDay);
+            const personalYear = changReduceNumber(dayValue + month + currentYear);
+            const personalMonth = changReduceNumber(personalYear + currentMonth);
+            const personalDay = changReduceNumber(personalMonth + currentDay);
 
             const { challenge1, challenge2, challenge3, challenge4 } = calculateChallenges(day, month, year);
             const { chang1, chang2, chang3, chang4 } = calculateChang(day, month, year);
@@ -1559,9 +1559,9 @@
                 ? reduceNumber(Math.abs(changReduceNumber(birthValue) - finalSum)) 
                 : reduceNumber(Math.abs(finalSum - changReduceNumber(birthValue)));
 
-            const personalYear = reduceNumber(dayValue + month + currentYear);
-            const personalMonth = reduceNumber(personalYear + currentMonth);
-            const personalDay = reduceNumber(personalMonth + currentDay);
+            const personalYear = changReduceNumber(dayValue + month + currentYear);
+            const personalMonth = changReduceNumber(personalYear + currentMonth);
+            const personalDay = changReduceNumber(personalMonth + currentDay);
 
             const { challenge1, challenge2, challenge3, challenge4 } = calculateChallenges(day, month, year);
             const { chang1, chang2, chang3, chang4 } = calculateChang(day, month, year);
