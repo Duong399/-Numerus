@@ -501,6 +501,49 @@
                 border-radius: 10px;
                 text-align: center;
             }
+            /* CSS cho tab Hành trình cuộc đời */
+            .life-journey-container {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .hexagon-chart-container {
+                height: 400px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: rgba(255, 255, 255, 0.05);
+                border-radius: 10px;
+                padding: 15px;
+            }
+
+            .life-journey-steps, .coach-funnel-steps {
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 10px;
+                padding: 20px;
+                text-align: left;
+            }
+
+            .life-journey-steps h4, .coach-funnel-steps h4 {
+                color: #b37aef;
+                margin-bottom: 10px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+                padding-bottom: 5px;
+            }
+
+            .life-journey-steps p, .coach-funnel-steps p {
+                margin: 10px 0;
+                line-height: 1.6;
+            }
+
+            .life-journey-steps ul, .coach-funnel-steps ul {
+                padding-left: 20px;
+            }
+
+            .life-journey-steps li, .coach-funnel-steps li {
+                margin: 5px 0;
+            }
         </style>
         <h3 style="font-size: 10px;">Nhập ngày/tháng/năm hiện tại</h3>
         <div class="current-date-container">
@@ -527,6 +570,7 @@
                     <button class="tab-button" onclick="openTab('maturity')">Trưởng thành</button>
                     <button class="tab-button" onclick="openTab('challenges')">Thách thức</button>
                     <button class="tab-button" onclick="openTab('pyramid')">Kim tự tháp</button>
+                    <button class="tab-button" onclick="openTab('lifeJourney')">Hành trình cuộc đời</button>
                 </div>
                 
                 <div id="overview" class="tab-content active">
@@ -601,6 +645,23 @@
                         <!-- Will be populated with pyramid cells -->
                     </div>
                     <div id="pyramid-description"></div>
+                </div>
+                <div id="lifeJourney" class="tab-content">
+                    <h3>Hành trình cuộc đời của bạn</h3>
+                    <div class="life-journey-container">
+                        <!-- Biểu đồ lục giác -->
+                        <div class="hexagon-chart-container" id="hexagon-chart">
+                            <!-- Biểu đồ lục giác sẽ được vẽ bằng JavaScript -->
+                        </div>
+                        <!-- Nội dung 8 bước kỹ thuật liên kết -->
+                        <div class="life-journey-steps" id="life-journey-steps">
+                            <!-- Nội dung sẽ được điền bằng JavaScript -->
+                        </div>
+                        <!-- Nội dung 8 bước coach phễu -->
+                        <div class="coach-funnel-steps" id="coach-funnel-steps">
+                            <!-- Nội dung sẽ được điền bằng JavaScript -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1409,7 +1470,7 @@
             const overviewData = [
                 { label: 'Đ.đời', value: numerologyResults.birthValue },
                 { label: 'Sứ mệnh', value: numerologyResults.finalSum },
-                { label: 'Linh hồn', value: numerologyResults.soulValue },
+                { label: 'Linh hồn', value: changReduceNumber(numerologyResults.soulValue) },
                 { label: 'Nhân cách', value: numerologyResults.personalityValue },
                 { label: 'Cân bằng', value: numerologyResults.balanceValue }
             ];
@@ -1477,6 +1538,25 @@
             // Tạo kim tự tháp số học
             createNumberPyramid();
             
+            // Tạo biểu đồ lục giác cho tab Hành trình cuộc đời
+            const hexagonValues = [
+                numerologyResults.birthValue,    // Đường đời
+                numerologyResults.finalSum,      // Sứ mệnh
+                numerologyResults.soulValue,     // Linh hồn
+                numerologyResults.personalityValue, // Nhân cách
+                numerologyResults.balanceValue,  // Cân bằng
+                numerologyResults.maturityValue, // Trưởng thành
+                numerologyResults.linkValue,     // Liên kết
+                numerologyResults.missingNumbers.length > 0 ? numerologyResults.missingNumbers[0] : 0 // Số thiếu (lấy số thiếu đầu tiên)
+            ];
+            createHexagonChart('hexagon-chart', hexagonValues);
+            
+            // Điền nội dung 8 bước kỹ thuật liên kết
+            await populateLifeJourneySteps();
+            
+            // Điền nội dung 8 bước coach phễu
+            populateCoachFunnelSteps();
+            
             // Lấy mô tả từ AI cho từng số
             getNumberDescription(numerologyResults.birthValue, 'đường đời').then(desc => {
                 document.getElementById('lifepath-description').innerHTML = `<p>${desc}</p>`;
@@ -1521,7 +1601,6 @@
             `;
             document.getElementById('challenges-description').innerHTML = challengesDesc;
         }
-
         // Utility: Trả về nhãn của số chủ
         function getMasterNumberLabel(num) {
             if (num === 11) return "Số chủ Trực giác";
@@ -1788,6 +1867,215 @@
 
             // Sau khi tính toán xong, hiển thị nút "Hiển thị chi tiết"
             document.getElementById('show-details-btn').style.display = 'block';
+        // Hàm vẽ biểu đồ lục giác
+        function createHexagonChart(containerId, values) {
+            const container = document.getElementById(containerId);
+            const size = 300;
+            const centerX = size / 2;
+            const centerY = size / 2;
+            const radius = 100;
+            const labels = ['Đ.đời', 'Sứ mệnh', 'Linh hồn', 'Nhân cách', 'Cân bằng', 'Trưởng thành', 'Liên kết', 'Số thiếu'];
+            
+            let svgContent = `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">`;
+            
+            // Tính toán các điểm của lục giác (8 đỉnh)
+            const points = [];
+            const maxValue = 11; // Giá trị tối đa của các chỉ số (thường là 11 hoặc 22, nhưng chuẩn hóa về 11 để vẽ)
+            for (let i = 0; i < 8; i++) {
+                const angle = (Math.PI / 4) * i - Math.PI / 2;
+                const value = Math.min(values[i], maxValue); // Giới hạn giá trị
+                const scaledRadius = (value / maxValue) * radius;
+                const x = centerX + scaledRadius * Math.cos(angle);
+                const y = centerY + scaledRadius * Math.sin(angle);
+                points.push({ x, y });
+            }
+            
+            // Vẽ đường nối các điểm (lục giác)
+            let pathData = `M ${points[0].x},${points[0].y}`;
+            for (let i = 1; i < points.length; i++) {
+                pathData += ` L ${points[i].x},${points[i].y}`;
+            }
+            pathData += ' Z';
+            svgContent += `<path d="${pathData}" fill="rgba(138, 43, 226, 0.3)" stroke="#b37aef" stroke-width="2" />`;
+            
+            // Vẽ các đường từ tâm đến các đỉnh
+            for (let i = 0; i < 8; i++) {
+                const angle = (Math.PI / 4) * i - Math.PI / 2;
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+                svgContent += `<line x1="${centerX}" y1="${centerY}" x2="${x}" y2="${y}" stroke="rgba(255, 255, 255, 0.2)" stroke-width="1" />`;
+                
+                // Thêm nhãn cho các chỉ số
+                const labelX = centerX + (radius + 30) * Math.cos(angle);
+                const labelY = centerY + (radius + 30) * Math.sin(angle);
+                svgContent += `<text x="${labelX}" y="${labelY}" text-anchor="middle" fill="white" font-size="12">${labels[i]}</text>`;
+                
+                // Thêm giá trị tại các đỉnh
+                const valueX = points[i].x;
+                const valueY = points[i].y;
+                svgContent += `<text x="${valueX}" y="${valueY - 15}" text-anchor="middle" fill="white" font-size="12">${values[i]}</text>`;
+            }
+            
+            // Vẽ tâm
+            svgContent += `<circle cx="${centerX}" cy="${centerY}" r="5" fill="#b37aef" />`;
+            
+            svgContent += `</svg>`;
+            container.innerHTML = svgContent;
+        }
+        // Hàm hiển thị nội dung 8 bước kỹ thuật liên kết
+        async function populateLifeJourneySteps() {
+            const container = document.getElementById('life-journey-steps');
+            if (!numerologyResults) {
+                container.innerHTML = '<p>Vui lòng tính toán các chỉ số trước khi xem hành trình!</p>';
+                return;
+            }
+
+            const steps = [];
+
+            // B1: Xuất phát từ chỉ số linh hồn
+            const soulDesc = await getNumberDescription(numerologyResults.soulValue, 'linh hồn');
+            steps.push(`
+                <h4>Bước 1: Khát khao sâu thẳm bên trong bạn (Chỉ số Linh hồn)</h4>
+                <p>Chúc mừng bạn! Chỉ số Linh hồn của bạn là <strong>${numerologyResults.soulValue}</strong>. Đây là khát khao sâu thẳm bên trong bạn, điều mà bạn luôn khao khát đạt được trong cuộc đời.</p>
+                <p>${soulDesc}</p>
+            `);
+
+            // B2: Cần tốt nghiệp bài học (Chỉ số Đường đời)
+            const lifepathDesc = await getNumberDescription(numerologyResults.birthValue, 'đường đời');
+            steps.push(`
+                <h4>Bước 2: Trở thành người bạn cần (Chỉ số Đường đời)</h4>
+                <p>Trên hành trình đó, bạn cần trở thành một người phù hợp với bài học của chỉ số Đường đời: <strong>${numerologyResults.birthValue}</strong>.</p>
+                <p>${lifepathDesc}</p>
+            `);
+
+            // B3: Tốt nghiệp chỉ số Liên kết
+            const linkDesc = await getNumberDescription(numerologyResults.linkValue, 'liên kết');
+            steps.push(`
+                <h4>Bước 3: Tốt nghiệp bài học Liên kết</h4>
+                <p>Để làm được điều đó, bạn cần tốt nghiệp bài học của chỉ số Liên kết: <strong>${numerologyResults.linkValue}</strong>.</p>
+                <p>${linkDesc}</p>
+            `);
+
+            // B4: Hoàn thành Sứ mệnh
+            const destinyDesc = await getNumberDescription(numerologyResults.finalSum, 'sứ mệnh');
+            steps.push(`
+                <h4>Bước 4: Hoàn thành Sứ mệnh của bạn</h4>
+                <p>Khi vượt qua được bài học liên kết, bạn sẽ hoàn thành sứ mệnh của mình với chỉ số Sứ mệnh: <strong>${numerologyResults.finalSum}</strong>.</p>
+                <p>${destinyDesc}</p>
+            `);
+
+            // B5: Tốt nghiệp chỉ số thiếu
+            steps.push(`
+                <h4>Bước 5: Tốt nghiệp chỉ số thiếu</h4>
+                <p>Ngoài ra, bạn cần chú ý đến các chỉ số thiếu: <strong>${numerologyResults.missingNumbers.join(', ')}</strong>.</p>
+                <p>Những con số này đại diện cho các kỹ năng và nguồn lực bạn cần phát triển. Hãy tập trung cải thiện những khía cạnh này để cân bằng năng lượng của bạn.</p>
+            `);
+
+            // B6: Chia sẻ chỉ số Chặng/Thách thức hiện tại
+            const currentYear = new Date().getFullYear();
+            let currentStage = '';
+            let currentChallenge = '';
+            if (currentYear <= numerologyResults.cyear1) {
+                currentStage = numerologyResults.chang1;
+                currentChallenge = numerologyResults.challenge1;
+            } else if (currentYear <= numerologyResults.cyear2) {
+                currentStage = numerologyResults.chang2;
+                currentChallenge = numerologyResults.challenge2;
+            } else if (currentYear <= numerologyResults.cyear3) {
+                currentStage = numerologyResults.chang3;
+                currentChallenge = numerologyResults.challenge3;
+            } else {
+                currentStage = numerologyResults.chang4;
+                currentChallenge = numerologyResults.challenge4;
+            }
+            const stageDesc = await getNumberDescription(currentStage, 'chặng hiện tại');
+            const challengeDesc = await getNumberDescription(currentChallenge, 'thách thức hiện tại');
+            steps.push(`
+                <h4>Bước 6: Chặng và Thách thức hiện tại</h4>
+                <p>Hiện tại, bạn đang ở chặng: <strong>${currentStage}</strong> với thách thức: <strong>${currentChallenge}</strong>.</p>
+                <p><strong>Chặng hiện tại:</strong> ${stageDesc}</p>
+                <p><strong>Thách thức hiện tại:</strong> ${challengeDesc}</p>
+            `);
+
+            // B7: Định hướng nghề nghiệp qua chỉ số Trưởng thành
+            const maturityDesc = await getNumberDescription(numerologyResults.maturityValue, 'trưởng thành');
+            steps.push(`
+                <h4>Bước 7: Định hướng nghề nghiệp (Chỉ số Trưởng thành)</h4>
+                <p>Chỉ số Trưởng thành của bạn là: <strong>${numerologyResults.maturityValue}</strong>. Đây là định hướng nghề nghiệp và sự phát triển lâu dài của bạn.</p>
+                <p>${maturityDesc}</p>
+            `);
+
+            // B8: Chúc mừng và xin cảm nhận
+            steps.push(`
+                <h4>Bước 8: Chúc mừng bạn!</h4>
+                <p>Chúc mừng bạn đã nhìn thấy hành trình cuộc đời của mình! Bạn cảm nhận như thế nào về hành trình này? Hãy chia sẻ cảm nhận của bạn nhé!</p>
+            `);
+
+            container.innerHTML = steps.join('');
+        }
+        // Hàm hiển thị nội dung 8 bước coach phễu
+        function populateCoachFunnelSteps() {
+            const container = document.getElementById('coach-funnel-steps');
+            const steps = [];
+
+            // B1: Chào hỏi
+            steps.push(`
+                <h4>Bước 1: Chào hỏi và tạo thiện cảm</h4>
+                <p>Xin chào bạn! Mình rất vui được gặp bạn hôm nay. Bạn có thể chia sẻ một chút về công việc, gia đình và cuộc sống hiện tại của bạn không? Mình muốn tìm hiểu thêm để có thể hỗ trợ bạn tốt nhất.</p>
+            `);
+
+            // B2: Giới thiệu bản thân
+            steps.push(`
+                <h4>Bước 2: Giới thiệu bản thân</h4>
+                <p>Mình là chuyên gia Life Coach của Gein Academy, đồng thời là chuyên viên phát triển bản thân. Hôm nay, chúng ta có duyên gặp nhau, mình có thể dành 10 phút để chia sẻ về hành trình cuộc đời của bạn không? Nếu bạn bận, chúng ta có thể hẹn lại sau nhé!</p>
+            `);
+
+            // B3: Hỏi về Thần số học (TSH) hoặc Map For Success (MFS)
+            steps.push(`
+                <h4>Bước 3: Tìm hiểu về hiểu biết của bạn với Thần số học</h4>
+                <p>Bạn đã từng nghe về Thần số học (TSH) hoặc Map For Success (MFS) chưa? Nếu có, bạn biết qua đâu? Nếu chưa, mình sẽ chia sẻ thêm cho bạn nhé!</p>
+                <p>Mình có một năng lực cảm nhận đặc biệt và đã chiêm nghiệm rất sâu về Thần số học. Mình đề nghị bạn ghi âm phiên coach này để có thể nghe lại và cảm nhận sự khác biệt.</p>
+            `);
+
+            // B4: Hỏi thông tin của khách hàng
+            steps.push(`
+                <h4>Bước 4: Xác nhận thông tin của bạn</h4>
+                <p>Mình đã có thông tin của bạn: Họ tên, ngày tháng năm sinh. Bạn có muốn mình phân tích thêm về hành trình cuộc đời của bạn không?</p>
+            `);
+
+            // B5: Chia sẻ tam giác vàng
+            steps.push(`
+                <h4>Bước 5: Chia sẻ tam giác vàng</h4>
+                <p>Chúc mừng bạn! Chỉ số Đường đời của bạn là <strong>${numerologyResults.birthValue}</strong>. Đây là chỉ số chiếm 50% tính cách và bài học của bạn. Chỉ số Liên kết của bạn là <strong>${numerologyResults.linkValue}</strong>, thể hiện cầu nối giữa Đường đời và Sứ mệnh.</p>
+            `);
+
+            // B6: Định hướng nghề nghiệp
+            steps.push(`
+                <h4>Bước 6: Định hướng nghề nghiệp</h4>
+                <p>Dựa trên chỉ số Năm cá nhân (<strong>${numerologyResults.personalYear}</strong>) và Tháng cá nhân (<strong>${numerologyResults.personalMonth}</strong>), bạn đang ở giai đoạn phát triển năng lực tích cực. Đây là thời điểm để bạn tập trung vào những phẩm chất tốt đẹp và phát triển bản thân.</p>
+            `);
+
+            // B7: Giới thiệu về MFS
+            steps.push(`
+                <h4>Bước 7: Giới thiệu về Map For Success (MFS)</h4>
+                <p>MFS là một công cụ giúp bạn vẽ ra bức tranh cuộc đời, từ đó tìm ra hướng đi đúng đắn. Có một khách hàng của mình, sau khi sử dụng MFS, đã chuyển hóa từ một người thiếu định hướng thành một người tự tin, thành công trong sự nghiệp. Bạn có muốn sở hữu một tấm bản đồ như vậy không?</p>
+            `);
+
+            // B8: Trao giá trị của MFS
+            steps.push(`
+                <h4>Bước 8: Trao giá trị của MFS</h4>
+                <ul>
+                    <li>Bạn sẽ nhận được 1 tấm bản đồ cứng và 1 bản mềm.</li>
+                    <li>Được coach 3-4 giờ để hiểu rõ hành trình của mình.</li>
+                    <li>Vẽ bức tranh cuộc đời trong tương lai.</li>
+                    <li>Được đồng hành từ 3-6 tháng đến 1 năm.</li>
+                    <li>Có giải pháp hành trình tẩy hạt, trả nghiệp để chuyển hóa.</li>
+                </ul>
+                <p>Chúng mình không chỉ bán Thần số học, mà bán sự chuyển hóa của bạn. Nếu bạn cam kết đồng hành cùng mình trong 9 ngày, mình sẽ dồn hết sức để giúp bạn!</p>
+            `);
+
+            container.innerHTML = steps.join('');
+        }
     </script>
 </body>
 </html>
