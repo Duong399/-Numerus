@@ -425,241 +425,460 @@
                 grid-template-columns: repeat(3, 1fr);
             }
         }
+        /* Header Navigation */
+        .header {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 15px 0;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header .logo {
+            display: flex;
+            align-items: center;
+            margin-left: 20px;
+        }
+
+        .header .logo img {
+            width: 100px;
+            height: 100px;
+            margin-right: 10px;
+        }
+
+        .header .logo span {
+            font-size: 20px;
+            font-weight: bold;
+            background: linear-gradient(90deg, #f3cb73, white, #f3cb73);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header .nav-menu {
+            display: flex;
+            gap: 20px;
+            margin-right: 20px;
+        }
+
+        .header .nav-menu a {
+            color: rgb(0, 0, 0);
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .header .nav-menu a:hover {
+            background: linear-gradient(90deg, #f3cb73, white, #f3cb73);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header .nav-menu .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .header .nav-menu .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.9);
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+
+        .header .nav-menu .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .header .nav-menu .dropdown-content a {
+            color: white;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+        }
+
+        .header .nav-menu .dropdown-content a:hover {
+            background: linear-gradient(90deg, #f3cb73, white, #f3cb73);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header .nav-menu .search-icon {
+            font-size: 18px;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 80px auto 50px auto;
+            padding: 20px;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Intro Section Styling */
+        .intro-content {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            text-align: left;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .intro-content h1 {
+            font-size: 28px;
+            background: linear-gradient(90deg, #f3cb73, white, #f3cb73);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .intro-content h3 {
+            font-size: 20px;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .intro-content h4 {
+            font-size: 18px;
+            background: linear-gradient(90deg, #f3cb73, white, #f3cb73);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .intro-content p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .intro-content ul {
+            padding-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        .intro-content ul li {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .intro-content .register-btn {
+            display: inline-block;
+            background: linear-gradient(90deg, #f3cb73, white, #f3cb73);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 20px 0;
+            transition: background-color 0.3s ease;
+        }
+
+        .intro-content .register-btn:hover {
+            background: linear-gradient(90deg, #f3cb73, white, #f3cb73);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .link {
+            background: linear-gradient(90deg, #f3cb73, white, #f3cb73);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
     </style>
 </head>
 <body>
+    <!-- Header Navigation -->
+    <header class="header">
+        <div class="logo">
+            <img src="https://cdn.qwenlm.ai/b75fede4-f5b4-495e-b566-661e48a46a97/d55301a3-d4a8-45e1-b5dc-3f82ee8c34bd_image.png?key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyZXNvdXJjZV91c2VyX2lkIjoiYjc1ZmVkZTQtZjViNC00OTVlLWI1NjYtNjYxZTQ4YTQ2YTk3IiwicmVzb3VyY2VfaWQiOiJkNTUzMDFhMy1kNGE4LTQ1ZTEtYjVkYy0zZjgyZWU4YzM0YmQiLCJyZXNvdXJjZV9jaGF0X2lkIjpudWxsfQ.94It_VTMrqSzzk5RJ4dnlDiKE3nUGAxUPZKc9XUhGZs">
+            <span>ELITE DIAMOND ACADEMY</span>
+        </div>
+        <nav class="nav-menu">
+            <a href="#" onclick="switchTab('intro')">Home</a>
+            <div class="dropdown">
+                <a href="#">Giới thiệu ▼</a>
+                <div class="dropdown-content">
+                    <a href="#" onclick="switchTab('intro')">Về chúng tôi</a>
+                    <a href="#" onclick="switchTab('numerology')">Dịch vụ Thần số học</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <a href="#">Tra Cứu ▼</a>
+                <div class="dropdown-content">
+                    <a href="#" onclick="switchTab('numerology')">Tra cứu Thần số học</a>
+                    <a href="#">Tra cứu năm cá nhân</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <a href="#">Dịch vụ ▼</a>
+                <div class="dropdown-content">
+                    <a href="#">Tư vấn cá nhân</a>
+                    <a href="#">Khóa học Thần số học</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <a href="#">Blog ▼</a>
+                <div class="dropdown-content">
+                    <a href="#">Bài viết mới</a>
+                    <a href="#">Kiến thức Thần số học</a>
+                </div>
+            </div>
+            <a href="#" onclick="switchTab('intro')">Đăng nhập</a>
+            <div class="dropdown">
+                <a href="#">Ngôn ngữ ▼</a>
+                <div class="dropdown-content">
+                    <a href="#">Tiếng Việt</a>
+                    <a href="#">English</a>
+                </div>
+            </div>
+            <a href="#" class="search-icon">🔍</a>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
     <div class="container">
-        <h1>Numerology Calculator</h1>
-        <input type="text" id="name" placeholder="Nhập họ tên">
-        <h2 style="font-size: 10px;">Nhập ngày/tháng/năm sinh</h2>
-        <div class="current-date-container">
-            <input list="birthDayList" id="birthDay" placeholder="Ngày">
-            <input list="birthMonthList" id="birthMonth" placeholder="Tháng">
-            <input list="birthYearList" id="birthYear" placeholder="Năm">
-        
-            <datalist id="birthDayList"></datalist>
-            <datalist id="birthMonthList"></datalist>
-            <datalist id="birthYearList"></datalist>
-        </div>
-        <!-- Nút zalo -->
-        <a id="zalo-button" href="https://zalo.me/0778305689" target="_blank">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/1200px-Icon_of_Zalo.svg.png" alt="zalo" style="width: 24px; height: 24px;">
-        </a>
-        <!-- Nút Messenger -->
-        <a id="messenger-button" href="https://www.facebook.com/ThinhnguyenEDA" target="_blank">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Facebook_Messenger_logo_2020.svg/1024px-Facebook_Messenger_logo_2020.svg.png" alt="Messenger" style="width: 24px; height: 24px;">
-        </a>
-        <!-- Nút hỏi đáp -->
-        <div id="chat-button" onclick="toggleChat()">💬 Hỏi đáp</div>
+        <!-- Tab Content -->
+        <div id="intro" class="tab-content active">
+            <div class="intro-content">
+                <h1>❤️ KHÓA HỌC 1 NGÀY: “MẬT MÃ THÀNH CÔNG THEO THIÊN ĐỊA NHÂN” ❤️</h1>
+                <h3>Khai phá Bản thân - Gia đình Và Phát triển Sự nghiệp</h3>
+                <hr>
+                <h4>⸻ Thời gian:</h4>
+                <p>• Thứ 7 Ngày: 19/4/2025</p>
+                <p>• Buổi học: từ 8h - 17h (Check-in từ 7h30)</p>
 
-        <!-- Khung chat -->
-        <div id="chat-box">
-            <div id="chat-header">
-                <span>Hỏi đáp về Thần số học</span>
-                <button id="close-chat" onclick="toggleChat()">×</button>
+                <h4>⸻ Địa điểm:</h4>
+                <p>• Quán Cafe Sách Đông Tây, Nhà số 1 Lô 3 Đồi Ngân Hàng, TP Hạ Long, Quảng Ninh</p>
+
+                <h4>⸻ Bạn sẽ nhận được gì từ khóa học này?</h4>
+                <ul>
+                    <li>☘️ <strong>Giải mã bí quyết thành công:</strong> Học cách khai phá bản thân qua những con số và triết lý “Thiên - Địa - Nhân” độc đáo.</li>
+                    <li>☘️ <strong>Tối ưu hóa mối quan hệ:</strong> Xây dựng nền tảng gia đình vững chắc và tạo mối liên kết bền vững với khách hàng – chìa khóa mở ra cánh cửa phát triển sự nghiệp.</li>
+                    <li>☘️ <strong>Ứng dụng thực tiễn:</strong> Áp dụng những nguyên tắc nhân số học để định hướng con đường thành công cá nhân cũng như kinh doanh, bất động sản, spa, mỹ phẩm…</li>
+                </ul>
+
+                <h4>⸻ Đối tượng tham gia:</h4>
+                <ul>
+                    <li>• Doanh nhân, chủ doanh nghiệp</li>
+                    <li>• Những người khao khát phát triển bản thân và sự nghiệp</li>
+                    <li>• Các bậc cha mẹ và học sinh quan tâm đến sự phát triển toàn diện</li>
+                </ul>
+
+                <h4>⸻ Vì sao nên tham gia?</h4>
+                <ul>
+                    <li>• <strong>Phương pháp độc đáo:</strong> Kết hợp giữa khoa học nhân số học và triết lý cổ truyền “Thiên - Địa - Nhân”</li>
+                    <li>• <strong>Bài giảng thiết thực:</strong> Học từ các case study cụ thể và trải nghiệm thực tiễn tại TP Hạ Long</li>
+                    <li>• <strong>Môi trường sáng tạo:</strong> Không gian Quán Cafe Sách Đông Tây sẽ mang lại cảm hứng và sự thư thái để học hỏi và giao lưu</li>
+                </ul>
+
+                <h4>⸻ Đăng ký ngay hôm nay để biến “Mật mã Thành Công” của riêng bạn thành hiện thực!</h4>
+                <p><strong>Liên hệ hotline:</strong> 0338638389</p>
+                <p><strong>Số điện thoại:</strong> 0338638389</p>
+                <p><strong>Email:</strong> <a href="mailto:maingavp86@gmail.com" class="link">maingavp86@gmail.com</a></p>
+                <p><strong>Link Zalo đăng ký:</strong> <a href="https://zalo.me/0338638389" target="_blank" class="link">Zalo</a></p>
+                <p><a href="https://docs.google.com/forms/d/e/1FAIpQLScGrTtnMSD4AC4YITDma-1bsRpKr8p7t079K8zCpOqq-C3fAg/viewform?usp=header" target="_blank" class="register-btn">Đăng ký ngay</a></p>
+
+                <p>👉🏻👉🏻👉🏻 Hãy đến và trải nghiệm hành trình chuyển mình, nơi mỗi con số sẽ là chìa khóa mở ra cánh cửa phát triển bản thân, gia đình và sự nghiệp của bạn.</p>
             </div>
-            <div id="chat-body">
-                <div id="chat-messages"></div>
-            </div>
-            <div id="chat-input-container">
-                <input type="text" id="chat-input" placeholder="Nhập câu hỏi của bạn..." onkeypress="handleChatInput(event)">
-                <button id="send-button" onclick="sendMessage()">Gửi</button>
-            </div>
         </div>
-        <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                const currentYear = new Date().getFullYear();
-                const data = {
-                    birthDayList: [1, 31],
-                    birthMonthList: [1, 12],
-                    birthYearList: [1900, currentYear]
-                };
-        
-                Object.entries(data).forEach(([id, range]) => {
-                    document.getElementById(id).innerHTML = Array.from(
-                        { length: range[1] - range[0] + 1 },
-                        (_, i) => `<option value="${i + range[0]}"></option>`
-                    ).join('');
-                });
-            });
-        </script>
-        
-        <style>
-            .current-date-container {
-                display: flex;
-                gap: 10px;
-                justify-content: center;
-                align-items: center;
-                margin-top: 10px;
-            }
-        
-            .current-date-container input {
-                flex: 1;
-                min-width: 100px;
-                padding: 10px;
-                border-radius: 10px;
-                text-align: center;
-            }
-            /* CSS cho tab Hành trình cuộc đời */
-            .life-journey-container {
-                display: flex;
-                flex-direction: column;
-                gap: 20px;
-            }
 
-            .hexagon-chart-container {
-                height: 400px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: rgba(255, 255, 255, 0.05);
-                border-radius: 10px;
-                padding: 15px;
-            }
+        <div id="numerology" class="tab-content">
+            <div class="numerology-content">
+                <h1>Numerology Calculator</h1>
+                <input type="text" id="name" placeholder="Nhập họ tên">
+                <h2 style="font-size: 10px;">Nhập ngày/tháng/năm sinh</h2>
+                <div class="current-date-container">
+                    <input list="birthDayList" id="birthDay" placeholder="Ngày">
+                    <input list="birthMonthList" id="birthMonth" placeholder="Tháng">
+                    <input list="birthYearList" id="birthYear" placeholder="Năm">
+                
+                    <datalist id="birthDayList"></datalist>
+                    <datalist id="birthMonthList"></datalist>
+                    <datalist id="birthYearList"></datalist>
+                </div>
+                <!-- Nút Zalo -->
+                <a id="zalo-button" href="https://zalo.me/0778305689" target="_blank">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/1200px-Icon_of_Zalo.svg.png" alt="zalo" style="width: 24px; height: 24px;">
+                </a>
+                <!-- Nút Messenger -->
+                <a id="messenger-button" href="https://www.facebook.com/ThinhnguyenEDA" target="_blank">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Facebook_Messenger_logo_2020.svg/1024px-Facebook_Messenger_logo_2020.svg.png" alt="Messenger" style="width: 24px; height: 24px;">
+                </a>
+                <!-- Nút hỏi đáp -->
+                <div id="chat-button" onclick="toggleChat()">💬 Hỏi đáp</div>
 
-            .life-journey-steps, .coach-funnel-steps {
-                background: rgba(255, 255, 255, 0.1);
-                border-radius: 10px;
-                padding: 20px;
-                text-align: left;
-            }
-
-            .life-journey-steps h4, .coach-funnel-steps h4 {
-                color: #b37aef;
-                margin-bottom: 10px;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-                padding-bottom: 5px;
-            }
-
-            .life-journey-steps p, .coach-funnel-steps p {
-                margin: 10px 0;
-                line-height: 1.6;
-            }
-
-            .life-journey-steps ul, .coach-funnel-steps ul {
-                padding-left: 20px;
-            }
-
-            .life-journey-steps li, .coach-funnel-steps li {
-                margin: 5px 0;
-            }
-        </style>
-        <h3 style="font-size: 10px;">Nhập ngày/tháng/năm hiện tại</h3>
-        <div class="current-date-container">
-            <select id="currentYear"></select>
-            <select id="currentMonth"></select>
-            <select id="currentDay"></select>
-        </div>
-        <button onclick="calculateNumerology()">Tính toán</button>
-        <div class="result" id="result"></div>
-        <button id="show-details-btn" style="display: none;" onclick="showDetailedView()">Hiển thị chi tiết</button>
-        <!-- Detailed View Modal -->
-        <div class="modal-overlay" id="detailed-modal">
-            <div class="modal-content">
-                <button class="close-modal" onclick="closeDetailedView()">×</button>
-                <h2>Chi tiết thần số học</h2>
-                
-                <div class="detailed-tabs">
-                    <button class="tab-button active" onclick="openTab('overview')">Tổng quan</button>
-                    <button class="tab-button" onclick="openTab('lifepath')">Đường đời</button>
-                    <button class="tab-button" onclick="openTab('destiny')">Sứ mệnh</button>
-                    <button class="tab-button" onclick="openTab('soul')">Linh hồn</button>
-                    <button class="tab-button" onclick="openTab('personality')">Nhân cách</button>
-                    <button class="tab-button" onclick="openTab('balance')">Cân bằng</button>
-                    <button class="tab-button" onclick="openTab('maturity')">Trưởng thành</button>
-                    <button class="tab-button" onclick="openTab('challenges')">Thách thức</button>
-                    <button class="tab-button" onclick="openTab('pyramid')">Kim tự tháp</button>
-                    <button class="tab-button" onclick="openTab('lifeJourney')">Hành trình cuộc đời</button>
-                </div>
-                
-                <div id="overview" class="tab-content active">
-                    <h3>Biểu đồ tổng quan</h3>
-                    <div class="chart-container" id="overview-chart">
-                        <!-- Chart will be added dynamically -->
+                <!-- Khung chat -->
+                <div id="chat-box">
+                    <div id="chat-header">
+                        <span>Hỏi đáp về Thần số học</span>
+                        <button id="close-chat" onclick="toggleChat()">×</button>
                     </div>
-                    <div class="number-grid" id="overview-numbers">
-                        <!-- Will be populated with number cards -->
+                    <div id="chat-body">
+                        <div id="chat-messages"></div>
+                    </div>
+                    <div id="chat-input-container">
+                        <input type="text" id="chat-input" placeholder="Nhập câu hỏi của bạn..." onkeypress="handleChatInput(event)">
+                        <button id="send-button" onclick="sendMessage()">Gửi</button>
                     </div>
                 </div>
+                <script>
+                    document.addEventListener("DOMContentLoaded", () => {
+                        const currentYear = new Date().getFullYear();
+                        const data = {
+                            birthDayList: [1, 31],
+                            birthMonthList: [1, 12],
+                            birthYearList: [1900, currentYear]
+                        };
                 
-                <div id="lifepath" class="tab-content">
-                    <h3>Số đường đời của bạn: <span id="lifepath-value"></span></h3>
-                    <div class="chart-container" id="lifepath-chart">
-                        <!-- Chart will be added dynamically -->
-                    </div>
-                    <div id="lifepath-description"></div>
-                </div>
+                        Object.entries(data).forEach(([id, range]) => {
+                            document.getElementById(id).innerHTML = Array.from(
+                                { length: range[1] - range[0] + 1 },
+                                (_, i) => `<option value="${i + range[0]}"></option>`
+                            ).join('');
+                        });
+                    });
+                </script>
                 
-                <div id="destiny" class="tab-content">
-                    <h3>Số sứ mệnh của bạn: <span id="destiny-value"></span></h3>
-                    <div class="chart-container" id="destiny-chart">
-                        <!-- Chart will be added dynamically -->
-                    </div>
-                    <div id="destiny-description"></div>
+                <h3 style="font-size: 10px;">Nhập ngày/tháng/năm hiện tại</h3>
+                <div class="current-date-container">
+                    <select id="currentYear"></select>
+                    <select id="currentMonth"></select>
+                    <select id="currentDay"></select>
                 </div>
-                
-                <div id="soul" class="tab-content">
-                    <h3>Số linh hồn của bạn: <span id="soul-value"></span></h3>
-                    <div class="chart-container" id="soul-chart">
-                        <!-- Chart will be added dynamically -->
-                    </div>
-                    <div id="soul-description"></div>
-                </div>
-                
-                <div id="personality" class="tab-content">
-                    <h3>Số nhân cách của bạn: <span id="personality-value"></span></h3>
-                    <div class="chart-container" id="personality-chart">
-                        <!-- Chart will be added dynamically -->
-                    </div>
-                    <div id="personality-description"></div>
-                </div>
-                
-                <div id="balance" class="tab-content">
-                    <h3>Số cân bằng của bạn: <span id="balance-value"></span></h3>
-                    <div class="chart-container" id="balance-chart">
-                        <!-- Chart will be added dynamically -->
-                    </div>
-                    <div id="balance-description"></div>
-                </div>
-                
-                <div id="maturity" class="tab-content">
-                    <h3>Số trưởng thành của bạn: <span id="maturity-value"></span></h3>
-                    <div class="chart-container" id="maturity-chart">
-                        <!-- Chart will be added dynamically -->
-                    </div>
-                    <div id="maturity-description"></div>
-                </div>
-                
-                <div id="challenges" class="tab-content">
-                    <h3>Các thách thức và chặng đường</h3>
-                    <div class="chart-container" id="challenges-chart">
-                        <!-- Chart will be added dynamically -->
-                    </div>
-                    <div id="challenges-description"></div>
-                </div>
-                
-                <div id="pyramid" class="tab-content">
-                    <h3>Kim tự tháp số học</h3>
-                    <div class="pyramid" id="number-pyramid">
-                        <!-- Will be populated with pyramid cells -->
-                    </div>
-                    <div id="pyramid-description"></div>
-                </div>
-                <div id="lifeJourney" class="tab-content">
-                    <h3>Hành trình cuộc đời của bạn</h3>
-                    <div class="life-journey-container">
-                        <!-- Biểu đồ lục giác -->
-                        <div class="hexagon-chart-container" id="hexagon-chart">
-                            <!-- Biểu đồ lục giác sẽ được vẽ bằng JavaScript -->
+                <button onclick="calculateNumerology()">Tính toán</button>
+                <div class="result" id="result"></div>
+                <button id="show-details-btn" style="display: none;" onclick="showDetailedView()">Hiển thị chi tiết</button>
+                <!-- Detailed View Modal -->
+                <div class="modal-overlay" id="detailed-modal">
+                    <div class="modal-content">
+                        <button class="close-modal" onclick="closeDetailedView()">×</button>
+                        <h2>Chi tiết thần số học</h2>
+                        
+                        <div class="detailed-tabs">
+                            <button class="tab-button active" onclick="openTab('overview')">Tổng quan</button>
+                            <button class="tab-button" onclick="openTab('lifepath')">Đường đời</button>
+                            <button class="tab-button" onclick="openTab('destiny')">Sứ mệnh</button>
+                            <button class="tab-button" onclick="openTab('soul')">Linh hồn</button>
+                            <button class="tab-button" onclick="openTab('personality')">Nhân cách</button>
+                            <button class="tab-button" onclick="openTab('balance')">Cân bằng</button>
+                            <button class="tab-button" onclick="openTab('maturity')">Trưởng thành</button>
+                            <button class="tab-button" onclick="openTab('challenges')">Thách thức</button>
+                            <button class="tab-button" onclick="openTab('pyramid')">Kim tự tháp</button>
+                            <button class="tab-button" onclick="openTab('lifeJourney')">Hành trình cuộc đời</button>
                         </div>
-                        <!-- Nội dung 8 bước kỹ thuật liên kết -->
-                        <div class="life-journey-steps" id="life-journey-steps">
-                            <!-- Nội dung sẽ được điền bằng JavaScript -->
+                        
+                        <div id="overview" class="tab-content active">
+                            <h3>Biểu đồ tổng quan</h3>
+                            <div class="chart-container" id="overview-chart">
+                                <!-- Chart will be added dynamically -->
+                            </div>
+                            <div class="number-grid" id="overview-numbers">
+                                <!-- Will be populated with number cards -->
+                            </div>
                         </div>
-                        <!-- Nội dung 8 bước coach phễu -->
-                        <div class="coach-funnel-steps" id="coach-funnel-steps">
-                            <!-- Nội dung sẽ được điền bằng JavaScript -->
+                        
+                        <div id="lifepath" class="tab-content">
+                            <h3>Số đường đời của bạn: <span id="lifepath-value"></span></h3>
+                            <div class="chart-container" id="lifepath-chart">
+                                <!-- Chart will be added dynamically -->
+                            </div>
+                            <div id="lifepath-description"></div>
+                        </div>
+                        
+                        <div id="destiny" class="tab-content">
+                            <h3>Số sứ mệnh của bạn: <span id="destiny-value"></span></h3>
+                            <div class="chart-container" id="destiny-chart">
+                                <!-- Chart will be added dynamically -->
+                            </div>
+                            <div id="destiny-description"></div>
+                        </div>
+                        
+                        <div id="soul" class="tab-content">
+                            <h3>Số linh hồn của bạn: <span id="soul-value"></span></h3>
+                            <div class="chart-container" id="soul-chart">
+                                <!-- Chart will be added dynamically -->
+                            </div>
+                            <div id="soul-description"></div>
+                        </div>
+                        
+                        <div id="personality" class="tab-content">
+                            <h3>Số nhân cách của bạn: <span id="personality-value"></span></h3>
+                            <div class="chart-container" id="personality-chart">
+                                <!-- Chart will be added dynamically -->
+                            </div>
+                            <div id="personality-description"></div>
+                        </div>
+                        
+                        <div id="balance" class="tab-content">
+                            <h3>Số cân bằng của bạn: <span id="balance-value"></span></h3>
+                            <div class="chart-container" id="balance-chart">
+                                <!-- Chart will be added dynamically -->
+                            </div>
+                            <div id="balance-description"></div>
+                        </div>
+                        
+                        <div id="maturity" class="tab-content">
+                            <h3>Số trưởng thành của bạn: <span id="maturity-value"></span></h3>
+                            <div class="chart-container" id="maturity-chart">
+                                <!-- Chart will be added dynamically -->
+                            </div>
+                            <div id="maturity-description"></div>
+                        </div>
+                        
+                        <div id="challenges" class="tab-content">
+                            <h3>Các thách thức và chặng đường</h3>
+                            <div class="chart-container" id="challenges-chart">
+                                <!-- Chart will be added dynamically -->
+                            </div>
+                            <div id="challenges-description"></div>
+                        </div>
+                        
+                        <div id="pyramid" class="tab-content">
+                            <h3>Kim tự tháp số học</h3>
+                            <div class="pyramid" id="number-pyramid">
+                                <!-- Will be populated with pyramid cells -->
+                            </div>
+                            <div id="pyramid-description"></div>
+                        </div>
+                        <div id="lifeJourney" class="tab-content">
+                            <h3>Hành trình cuộc đời của bạn</h3>
+                            <div class="life-journey-container">
+                                <!-- Biểu đồ lục giác -->
+                                <div class="hexagon-chart-container" id="hexagon-chart">
+                                    <!-- Biểu đồ lục giác sẽ được vẽ bằng JavaScript -->
+                                </div>
+                                <!-- Nội dung 8 bước kỹ thuật liên kết -->
+                                <div class="life-journey-steps" id="life-journey-steps">
+                                    <!-- Nội dung sẽ được điền bằng JavaScript -->
+                                </div>
+                                <!-- Nội dung 8 bước coach phễu -->
+                                <div class="coach-funnel-steps" id="coach-funnel-steps">
+                                    <!-- Nội dung sẽ được điền bằng JavaScript -->
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -668,6 +887,45 @@
     </div>
 
     <script>
+    // Tab Switching
+        function switchTab(tabId) {
+            // Hide all tab contents
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let content of tabContents) {
+                content.classList.remove('active');
+            }
+            
+            // Show the selected tab content
+            const selectedTab = document.getElementById(tabId);
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+            }
+            
+            // Update URL hash for deep linking (optional)
+            window.location.hash = tabId;
+            
+            return false; // Prevent default link behavior
+        }
+
+        // Initialize tabs based on URL hash when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if there's a hash in the URL
+            const hash = window.location.hash.substring(1);
+            if (hash && document.getElementById(hash)) {
+                switchTab(hash);
+            }
+            
+            // Add click event listeners to all tab links
+            const tabLinks = document.querySelectorAll('[onclick*="switchTab"]');
+            tabLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault(); // Prevent default link behavior
+                    const tabId = this.getAttribute('onclick').match(/'([^']+)'/)[1];
+                    switchTab(tabId);
+                });
+            });
+        });
+        
         let numerologyResults = null; // Biến toàn cục để lưu kết quả
         // API Key của Cohere (thay thế bằng API Key của bạn)
         const COHERE_API_KEY = "9MHD0XvvmkJQGfQpogAmNw6ozsZalaZa57OVFMPE"; // Thay YOUR_COHERE_API_KEY bằng API Key thực tế
@@ -1252,25 +1510,30 @@
         }
 
         // Chuyển đổi tab
-        function openTab(tabName) {
-            // Ẩn tất cả tab-content
-            const tabContents = document.getElementsByClassName('tab-content');
-            for (let i = 0; i < tabContents.length; i++) {
-                tabContents[i].classList.remove('active');
-            }
+        function openTab(tabId) {
+            // Ẩn tất cả tab content trong modal
+            const detailedTabs = document.querySelectorAll('.modal-content .tab-content');
+            detailedTabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
             
-            // Bỏ active tất cả nút tab
-            const tabButtons = document.getElementsByClassName('tab-button');
-            for (let i = 0; i < tabButtons.length; i++) {
-                tabButtons[i].classList.remove('active');
-            }
+            // Loại bỏ class active từ tất cả tab button
+            const tabButtons = document.querySelectorAll('.modal-content .tab-button');
+            tabButtons.forEach(button => {
+                button.classList.remove('active');
+            });
             
             // Hiển thị tab được chọn
-            document.getElementById(tabName).classList.add('active');
-            
-            // Thêm active cho nút tab được chọn
-            const currentTabButton = document.querySelector(`.tab-button[onclick="openTab('${tabName}')"]`);
-            currentTabButton.classList.add('active');
+            const selectedTab = document.getElementById(tabId);
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+                
+                // Tìm và kích hoạt button tương ứng
+                const activeButton = document.querySelector(`.tab-button[onclick="openTab('${tabId}')"]`);
+                if (activeButton) {
+                    activeButton.classList.add('active');
+                }
+            }
         }
 
         // Mảng màu cho biểu đồ
