@@ -584,22 +584,23 @@
 
         .intro-content .register-btn {
             display: inline-block;
-            background: linear-gradient(90deg, #f3cb73, white, #f3cb73);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            color: white;
+            background: linear-gradient(90deg, #f3cb73, #e0a526); /* Gradient background for button */
+            color: #fff; /* White text color */
             padding: 12px 24px;
             border-radius: 25px;
             text-decoration: none;
             font-weight: bold;
             margin: 20px 0;
-            transition: background-color 0.3s ease;
+            transition: background 0.3s ease, transform 0.2s ease;
+            text-align: center;
         }
 
         .intro-content .register-btn:hover {
-            background: linear-gradient(90deg, #f3cb73, white, #f3cb73);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            background: linear-gradient(90deg, #e0a526, #f3cb73); /* Reverse gradient on hover */
+            transform: scale(1.05); /* Slight scale effect on hover */
+        }
+        .intro-content p {
+            text-align: center;
         }
         .link {
             background: linear-gradient(90deg, #f3cb73, white, #f3cb73);
