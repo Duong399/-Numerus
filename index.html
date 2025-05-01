@@ -431,7 +431,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Numerology Calculator</h1>
+        <h1>numerology</h1>
         <input type="text" id="name" placeholder="Nhập họ tên">
         <h2 style="font-size: 10px;">Nhập ngày/tháng/năm sinh</h2>
         <div class="current-date-container">
@@ -767,7 +767,7 @@
             const daySelect = document.getElementById('currentDay');
             const currentYear = new Date().getFullYear();
 
-            for (let y = 2000; y <= currentYear + 10; y++) {
+            for (let y = 1900; y <= currentYear + 10; y++) {
                 yearSelect.innerHTML += `<option value="${y}">${y}</option>`;
             }
 
@@ -1002,7 +1002,7 @@
             const currentDay = parseInt(document.getElementById('currentDay').value);
             
 
-            const { reducedSums, finalSum, soulValue, soulSum, soulDetails, personalityValue, personalityDetails, balanceValue, balanceSum, balanceDetails, lastNameValue, nameValue } = calculateNameValue(name);
+            const { reducedSums, finalSum, soulValue, soulSum, soulDetails, personalityValue, personalityDetails, balanceValue, balanceSum, balanceDetails, lastNameValue } = calculateNameValue(name);
 
 
 
@@ -1018,6 +1018,77 @@
             const personalYear = changReduceNumber(dayValue + month + currentYear);
             const personalMonth = changReduceNumber(personalYear + currentMonth);
             const personalDay = changReduceNumber(personalMonth + currentDay);
+            const attitude = day+month;
+            const soulnlityv = Math.abs(soulValue - personalityValue);
+            const genarat = reduceNumber(year);
+            const isVowel = char => 'aeiou'.includes(char.toLowerCase());
+            const soulName = [...name].filter(isVowel).join('');
+            const soulNumberRaw = [...soulName].map(char => charToNumber(char)).reduce((a, b) => a + b, 0);
+
+            const specialLessons = {
+                13: 4,
+                14: 5,
+                15: 6,
+                16: 7,
+                19: 1
+            };
+
+            const matchesKeyFromTwoParts = (a, b, key) => {
+                if (a >= 10 || b >= 10) return false;
+                const digits = [a, b];
+                const keyDigits = key.split('');
+                if (key === '19') {
+                    return (a === 1 && b === 9) || (a === 9 && b === 1);
+                }
+                return keyDigits.every(d => digits.includes(parseInt(d)));
+            };
+
+            const matchesKeyFromSum = (sum, key) => {
+                const sumDigits = sum.toString().split('');
+                const keyDigits = key.split('');
+                return keyDigits.every(d => sumDigits.includes(d));
+            };
+
+            // Tính nameValue nhưng giữ tổng chưa giảm
+            const nameParts = name.split(' ').map(part => {
+                const partSum = [...part].reduce((sum, char) => sum + (letterValues[char] || 0), 0);
+                return reduceNumber(partSum); // Giảm từng phần
+            });
+            const nameValueRaw = nameParts.reduce((a, b) => a + b, 0); // Tổng chưa giảm hoàn toàn
+            const nameValue = reduceNumber(nameValueRaw); // Tổng đã giảm (dùng để hiển thị Sứ mệnh)
+
+            // Thành phần của từng loại
+            const rawComponents = [
+                [reduceNumber(day), reduceNumber(month), reduceNumber(year)], // đường đời
+                [nameValueRaw], // sứ mệnh (dùng tổng chưa giảm để tính bài học)
+                [...soulName].map(char => charToNumber(char)), // linh hồn
+                [reduceNumber(birthValue), reduceNumber(finalSum)] // trưởng thành
+            ];
+
+            const lessons = [];
+
+            for (const components of rawComponents) {
+                const sum = components.reduce((a, b) => a + b, 0);
+
+                for (const key in specialLessons) {
+                    const lessonValue = specialLessons[key];
+
+                    if (components.length === 2) {
+                        if (matchesKeyFromTwoParts(components[0], components[1], key)) {
+                            lessons.push(`${key}/${lessonValue}`);
+                            break;
+                        }
+                    } else {
+                        if (matchesKeyFromSum(sum, key)) {
+                            lessons.push(`${key}/${lessonValue}`);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            const result = lessons.length > 0 ? lessons.join(', ') : "Không có bài học đặc biệt";
+
 
             const { challenge1, challenge2, challenge3, challenge4 } = calculateChallenges(day, month, year);
             const { chang1, chang2, chang3, chang4 } = calculateChang(day, month, year);
@@ -1072,7 +1143,7 @@
                 {
                     label: 'Sứ mệnh',
                     value: finalSum,
-                    tooltip: `Bằng tổng họ và tên: ${name} → ${[...name].map(char => `${char}: ${charToNumber(char)}`).join(' + ')} → Tổng = ${nameValue} → ${reduceNumber(nameValue)}${[11, 22, 33].includes(finalSum) ? ' (Số đặc biệt)' : ''}`
+                    tooltip: `Bằng tổng họ và tên: ${name} → ${[...name].map(char => `${char}: ${charToNumber(char)}`).join(' + ')} → Tổng = ${name.split(' ').map(part => reduceNumber([...part].reduce((sum, char) => sum + charToNumber(char), 0))).join(' + ')} → ${name.split(' ').map(part => reduceNumber([...part].reduce((sum, char) => sum + charToNumber(char), 0))).reduce((a, b) => a + b, 0)} → ${reduceNumber(name.split(' ').map(part => reduceNumber([...part].reduce((sum, char) => sum + charToNumber(char), 0))).reduce((a, b) => a + b, 0))}${[11, 22, 33].includes(finalSum) ? ' (Số đặc biệt)' : ''}`
                 },
                 {
                     label: 'Liên kết', 
@@ -1087,14 +1158,29 @@
                     tooltip: `(${soulDetails.join(" + ")}) = ${soulSum} → ${reduceNumber(soulValue)}${[11, 22, 33].includes(reduceNumber(soulValue)) ? ' (Số đặc biệt)' : ''}`
                 },
                 {
-                    label: 'Trưởng thành',
-                    value: maturityValue,
-                    tooltip: `Bằng đường đời + sứ mệnh:(${birthValue} + ${finalSum}) = ${birthValue + finalSum} → ${maturityValue}${[11, 22, 33].includes(maturityValue) ? ' (Số đặc biệt)' : ''}`
+                    label: 'Ngày sinh',
+                    value: dayValue,
+                    tooltip: `ngày sinh: ${day} = ${splitDigits(day)} → ${dayValue}`
                 },
                 {
                     label: 'Nhân cách',
                     value: personalityValue,
                     tooltip: `Bằng tổng các phụ âm ${personalityDetails.join(" + ")} = ${personalityValue}${[11, 22, 33].includes(personalityValue) ? ' (Số đặc biệt)' : ''}`
+                },
+                {
+                    label: 'Liên kết linh hồn & nhân cách',
+                    value: soulnlityv,
+                    tooltip: `Hiệu linh hồn (${soulValue}) và nhân cách (${personalityValue}) → ${Math.max(soulValue, personalityValue)} - ${Math.min(soulValue, personalityValue)} = ${soulnlityv}`
+                },
+                {
+                    label: 'Trưởng thành',
+                    value: maturityValue,
+                    tooltip: `Bằng đường đời + sứ mệnh:(${birthValue} + ${finalSum}) = ${birthValue + finalSum} → ${maturityValue}${[11, 22, 33].includes(maturityValue) ? ' (Số đặc biệt)' : ''}`
+                },
+                {
+                    label: 'Số thiếu',
+                    value: missingNumbers.join(', '),
+                    tooltip: `Số không có trong họ và tên: ${missingNumbers.join(', ')}`
                 },
                 {
                     label: 'Tư duy lý trí',
@@ -1107,14 +1193,19 @@
                     tooltip: `Sức mạnh tiềm thức bằng  9 - lượng số thiếu: ${9} - ${missingNumbers.length} → ${9 - missingNumbers.length}`
                 },
                 {
-                    label: 'Ngày sinh',
-                    value: dayValue,
-                    tooltip: `ngày sinh: ${day} = ${splitDigits(day)} → ${dayValue}`
-                },
-                {
                     label: 'Đam mê',
                     value: passion,
                     tooltip: `Số hiển thị nhiều nhất trong họ và tên: ${passion}`
+                },
+                {
+                    label: 'Thái độ',
+                    value: attitude,
+                    tooltip: `ngày sinh+tháng sinh: ${day} + ${month} --> ${attitude}`
+                },
+                {
+                    label: 'Thế hệ',
+                    value: genarat,
+                    tooltip: `năm sinh: ${year} --> ${genarat}`
                 },
                 {
                     label: 'Năm cá nhân',
@@ -1130,6 +1221,11 @@
                     label: 'Ngày cá nhân',
                     value: personalDay,
                     tooltip: `Bằng tổng tháng cá nhân và ngày hiện tại: ${personalMonth} + ${currentDay} → ${personalDay}`
+                },
+                {
+                    label: 'Bài học',
+                    value: lessons,
+                    tooltip: lessons ? `Bài học: ${lessons}` : 'Không có bài học'
                 },
                 {
                     label: 'Chặng',
@@ -1214,11 +1310,6 @@
                             </tr>
                         </table>
                     `
-                },
-                {
-                    label: 'Số thiếu',
-                    value: missingNumbers.join(', '),
-                    tooltip: `Số không có trong họ và tên: ${missingNumbers.join(', ')}`
                 },
             ];
 
@@ -1616,258 +1707,9 @@
             return labels[(num - 1) % 9];
         }
 
-        // Sau khi tính toán, hiển thị nút chi tiết
-        function calculateNumerology() {
-            // Giữ lại phần mã JavaScript ban đầu của bạn ở đây
-            const name = removeDiacritics(document.getElementById('name').value);
-            const day = parseInt(document.getElementById('birthDay').value);
-            const month = parseInt(document.getElementById('birthMonth').value);
-            const year = parseInt(document.getElementById('birthYear').value);
-            const currentYear = parseInt(document.getElementById('currentYear').value);
-            const currentMonth = parseInt(document.getElementById('currentMonth').value);
-            const currentDay = parseInt(document.getElementById('currentDay').value);
-            
 
-            const { reducedSums, finalSum, soulValue, soulSum, soulDetails, personalityValue, personalityDetails, balanceValue, balanceSum, balanceDetails, lastNameValue, nameValue } = calculateNameValue(name);
-
-            const dayValue = reduceNumber(day);
-            const birthValue = calculateBirthValue(day, month, year);
-
-            const maturityValue = reduceNumber(birthValue + finalSum);
-
-            const linkValue = birthValue > finalSum 
-                ? reduceNumber(Math.abs(changReduceNumber(birthValue) - finalSum)) 
-                : reduceNumber(Math.abs(finalSum - changReduceNumber(birthValue)));
-
-            const personalYear = changReduceNumber(dayValue + month + currentYear);
-            const personalMonth = changReduceNumber(personalYear + currentMonth);
-            const personalDay = changReduceNumber(personalMonth + currentDay);
-
-            const { challenge1, challenge2, challenge3, challenge4 } = calculateChallenges(day, month, year);
-            const { chang1, chang2, chang3, chang4 } = calculateChang(day, month, year);
-
-            const missingNumbers = Array.from({ length: 9 }, (_, i) => i + 1).filter(num => !name.toLowerCase().split('').map(char => letterValues[char] || 0).includes(num));
-            const passion = findMostFrequentNumber(name);
-            const logicalMind = changReduceNumber(lastNameValue + dayValue);
-            const age1 = 36 - changReduceNumber(birthValue);
-            const age2 = age1 + 9;
-            const age3 = age2 + 9;
-            const age4 = age3 + 9;
-            const cyear1 = year + age1;
-            const cyear2 = cyear1 + 9;
-            const cyear3 = cyear2 + 9;
-            const cyear4 = cyear3 + 9;
-            
-            // Lưu kết quả vào biến toàn cục
-            numerologyResults = {
-                birthValue,
-                balanceValue,
-                finalSum,
-                linkValue,
-                soulValue,
-                maturityValue,
-                personalityValue,
-                logicalMind,
-                missingNumbers,
-                passion,
-                personalYear,
-                personalMonth,
-                personalDay,
-                chang1,
-                chang2,
-                chang3,
-                chang4,
-                challenge1,
-                challenge2,
-                challenge3,
-                challenge4,
-                age1,
-                age2,
-                age3,
-                age4,
-                cyear1,
-                cyear2,
-                cyear3,
-                cyear4
-            };
-
-            // Phần hiển thị kết quả ban đầu của bạn (giữ lại)
-            const results = [
-                    { 
-                        label: 'Đường đời', 
-                        value: birthValue,
-                        tooltip: `Bằng tổng ngày tháng năm sinh:(${day} + ${month} + ${year}) → ${reduceNumber(day)} + ${reduceNumber(month)} + ${reduceNumber(year)} = ${birthValue}${[11, 22, 33].includes(birthValue) ? ' (Số đặc biệt)' : ''}`
-                    },
-                    {
-                        label: 'Cân bằng',
-                        value: balanceValue,
-                        tooltip: `Bằng tổng các chữ cái đầu của Họ và tên:(${balanceDetails.join(" + ")}) = ${balanceSum} → ${balanceValue}${[11, 22, 33].includes(balanceValue) ? ' (Số đặc biệt)' : ''}`
-                    },
-                    {
-                        label: 'Sứ mệnh',
-                        value: finalSum,
-                        tooltip: `Bằng tổng họ và tên: ${name} → ${[...name].map(char => `${char}: ${charToNumber(char)}`).join(' + ')} → Tổng = ${nameValue} → ${reduceNumber(nameValue)}${[11, 22, 33].includes(finalSum) ? ' (Số đặc biệt)' : ''}`
-                    },
-                    {
-                        label: 'Liên kết',
-                        value: linkValue,
-                        tooltip: birthValue > finalSum 
-                            ? `Bằng hiệu đường đời và sứ mệnh:${changReduceNumber(birthValue)} - ${finalSum} → ${linkValue}${[11, 22, 33].includes(linkValue) ? ' (Số đặc biệt)' : ''}`
-                            : `Bằng hiệu sứ mệnh và đường đời:${finalSum} - ${changReduceNumber(birthValue)} → ${linkValue}${[11, 22, 33].includes(linkValue) ? ' (Số đặc biệt)' : ''}`
-                    },
-                    {
-                        label: 'Linh hồn',
-                        value: reduceNumber(soulValue),
-                        tooltip: `(${soulDetails.join(" + ")}) = ${soulSum} → ${reduceNumber(soulValue)}${[11, 22, 33].includes(reduceNumber(soulValue)) ? ' (Số đặc biệt)' : ''}`
-                    },
-                    {
-                        label: 'Trưởng thành',
-                        value: maturityValue,
-                        tooltip: `Bằng đường đời + sứ mệnh:(${birthValue} + ${finalSum}) = ${birthValue + finalSum} → ${maturityValue}${[11, 22, 33].includes(maturityValue) ? ' (Số đặc biệt)' : ''}`
-                    },
-                    {
-                        label: 'Nhân cách',
-                        value: personalityValue,
-                        tooltip: `Bằng tổng các phụ âm ${personalityDetails.join(" + ")} = ${personalityValue}${[11, 22, 33].includes(personalityValue) ? ' (Số đặc biệt)' : ''}`
-                    },
-                    {
-                        label: 'Tư duy lý trí',
-                        value: logicalMind,
-                        tooltip: `Bằng tên + ngày sinh:(${lastNameValue} , ${dayValue}) = ${lastNameValue + dayValue} → ${logicalMind}${[11, 22, 33].includes(logicalMind) ? ' (Số đặc biệt)' : ''}`
-                    },
-                    {
-                        label: 'Sức mạnh tiềm thức',
-                        value: 9 - missingNumbers.length,
-                        tooltip: `Sức mạnh tiềm thức bằng  9 - lượng số thiếu: ${9} - ${missingNumbers.length} → ${9 - missingNumbers.length}`
-                    },
-                    {
-                        label: 'Ngày sinh',
-                        value: dayValue,
-                        tooltip: `ngày sinh: ${day} = ${splitDigits(day)} → ${dayValue}`
-                    },
-                    {
-                        label: 'Đam mê',
-                        value: passion,
-                        tooltip: `Số hiển thị nhiều nhất trong họ và tên: ${passion}`
-                    },
-                    {
-                        label: 'Năm cá nhân',
-                        value: personalYear,
-                        tooltip: `ngày sinh + tháng sinh + năm hiện tại: ${dayValue} + ${month} + ${currentYear} → ${personalYear}`
-                    },
-                    {
-                        label: 'Tháng cá nhân',
-                        value: personalMonth,
-                        tooltip: `Bằng tổng năm cá nhân và tháng hiện tại: ${personalYear} + ${currentMonth} → ${personalMonth}`
-                    },
-                    {
-                        label: 'Ngày cá nhân',
-                        value: personalDay,
-                        tooltip: `Bằng tổng tháng cá nhân và ngày hiện tại: ${personalMonth} + ${currentDay} → ${personalDay}`
-                    },
-                    {
-                        label: 'Chặng',
-                        value: `${chang1}, ${chang2}, ${chang3}, ${chang4}`,
-                        tooltip: `
-                            <p><strong>Chi tiết tính toán:</strong></p>
-                            <p>Chặng 1: (${day} + ${month} = ${chang1})</p>
-                            <p>Chặng 2: (${day} + ${year} = ${chang2})</p>
-                            <p>Chặng 3: (${chang1} + ${chang2} = ${chang3})</p>
-                            <p>Chặng 4: (${month} + ${year} = ${chang4})</p>
-                            <table border="1" cellspacing="0" cellpadding="5">
-                                <tr>
-                                    <th>Chặng</th>
-                                    <td>${chang1}</td>
-                                    <td>${chang2}</td>
-                                    <td>${chang3}</td>
-                                    <td>${chang4}</td>
-                                </tr>
-                                <tr>
-                                    <th>Thách thức</th>
-                                    <td>${challenge1}</td>
-                                    <td>${challenge2}</td>
-                                    <td>${challenge3}</td>
-                                    <td>${challenge4}</td>
-                                </tr>
-                                <tr>
-                                    <th>Tuổi</th>
-                                    <td>0 - ${age1}</td>
-                                    <td>${age1 + 1} - ${age2}</td>
-                                    <td>${age2 + 1} - ${age3}</td>
-                                    <td>${age3 + 1} - ${age4}</td>
-                                </tr>
-                                <tr>
-                                    <th>Năm</th>
-                                    <td>${year} - ${cyear1}</td>
-                                    <td>${cyear1 + 1} - ${cyear2}</td>
-                                    <td>${cyear2 + 1} - ${cyear3}</td>
-                                    <td>${cyear3 + 1} - ${cyear4}</td>
-                                </tr>
-                            </table>
-                        `
-                    },
-                    {
-                        label: 'Thách thức',
-                        value: `${challenge1}, ${challenge2}, ${challenge3}, ${challenge4}`,
-                        tooltip: `
-                            <p><strong>Chi tiết tính toán:</strong></p>
-                            <p>Thách thức 1: (${day} - ${month} = ${challenge1})</p>
-                            <p>Thách thức 2: (${day} - ${year} = ${challenge2})</p>
-                            <p>Thách thức 3: (${challenge1} - ${challenge2} = ${challenge3})</p>
-                            <p>Thách thức 4: (${month} - ${year} = ${challenge4})</p>
-                            <table border="1" cellspacing="0" cellpadding="5">
-                                <tr>
-                                    <th>Chặng</th>
-                                    <td>${chang1}</td>
-                                    <td>${chang2}</td>
-                                    <td>${chang3}</td>
-                                    <td>${chang4}</td>
-                                </tr>
-                                <tr>
-                                    <th>Thách thức</th>
-                                    <td>${challenge1}</td>
-                                    <td>${challenge2}</td>
-                                    <td>${challenge3}</td>
-                                    <td>${challenge4}</td>
-                                </tr>
-                                <tr>
-                                    <th>Tuổi</th>
-                                    <td>0 - ${age1}</td>
-                                    <td>${age1 + 1} - ${age2}</td>
-                                    <td>${age2 + 1} - ${age3}</td>
-                                    <td>${age3 + 1} - ${age4}</td>
-                                </tr>
-                                <tr>
-                                    <th>Năm</th>
-                                    <td>${year} - ${cyear1}</td>
-                                    <td>${cyear1 + 1} - ${cyear2}</td>
-                                    <td>${cyear2 + 1} - ${cyear3}</td>
-                                    <td>${cyear3 + 1} - ${cyear4}</td>
-                                </tr>
-                            </table>
-                        `
-                    },
-                    {
-                        label: 'Số thiếu',
-                        value: missingNumbers.join(', '),
-                        tooltip: `Số không có trong họ và tên: ${missingNumbers.join(', ')}`
-                    }
-                ];
-
-                // Hiển thị kết quả lên giao diện
-                document.getElementById('result').innerHTML = results
-                    .map(item => {
-                        const tooltip = item.tooltip ? `<div class="tooltip-text">${item.tooltip}</div>` : '';
-                        return `<div class="result-item tooltip">
-                                    <strong>${item.label}:</strong> ${item.value}
-                                    ${tooltip}
-                                </div>`;
-                    })
-                    .join('');
-            }
-
-            // Sau khi tính toán xong, hiển thị nút "Hiển thị chi tiết"
-            document.getElementById('show-details-btn').style.display = 'block';
+        // Sau khi tính toán xong, hiển thị nút "Hiển thị chi tiết"
+        document.getElementById('show-details-btn').style.display = 'block';
         // Hàm vẽ biểu đồ lục giác
         function createHexagonChart(containerId, values) {
             const container = document.getElementById(containerId);
