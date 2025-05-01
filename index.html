@@ -1018,7 +1018,7 @@
             const personalYear = changReduceNumber(dayValue + month + currentYear);
             const personalMonth = changReduceNumber(personalYear + currentMonth);
             const personalDay = changReduceNumber(personalMonth + currentDay);
-            const attitude = day+month;
+            const attitude = reduceNumber(day+month);
             const soulnlityv = Math.abs(soulValue - personalityValue);
             const genarat = reduceNumber(year);
             const isVowel = char => 'aeiou'.includes(char.toLowerCase());
