@@ -721,14 +721,21 @@
                 return "Vui lòng tính toán các chỉ số trước khi hỏi.";
             }
 
-            // Thêm hướng dẫn rõ ràng để AI trả lời bằng tiếng Việt
-            const context = `Bạn là một chuyên gia Numerology. Hãy trả lời câu hỏi sau bằng tiếng Việt một cách ngắn gọn và dễ hiểu. Các chỉ số Numerology của bạn là: 
-            - Đường đời: ${numerologyResults.birthValue}
-            - Cân bằng: ${numerologyResults.balanceValue}
-            - Sứ mệnh: ${numerologyResults.finalSum}
-            - Linh hồn: ${numerologyResults.soulValue}
-            - Nhân cách: ${numerologyResults.personalityValue}
-            - Năm cá nhân: ${numerologyResults.personalYear}
+            // Cập nhật context để yêu cầu trả lời giống tài liệu, sử dụng khái niệm Cây Cuộc Đời và năng lượng số
+            const context = `Bạn là một chuyên gia Thần Số Học. Hãy trả lời câu hỏi sau bằng tiếng Việt, ngắn gọn (150-200 từ), dễ hiểu, sâu sắc, theo phong cách giáo dục và tích hợp khái niệm "Cây Cuộc Đời" (Rễ: tố chất bẩm sinh, Thân: bài học Đường Đời, Tán: Sứ Mệnh). Câu trả lời cần đề cập đến cách áp dụng năng lượng số trong đời sống, nghiệp và phước liên quan, đồng thời đưa ra lời khuyên thực hành (ví dụ: thiền, phóng sinh, biết ơn). Các chỉ số Numerology của người hỏi là:
+            - Đường Đời: ${numerologyResults.birthValue}
+            - Sứ Mệnh: ${numerologyResults.finalSum}
+            - Linh Hồn: ${numerologyResults.soulValue}
+            - Nhân Cách: ${numerologyResults.personalityValue}
+            - Cân Bằng: ${numerologyResults.balanceValue}
+            - Liên Kết: ${numerologyResults.linkValue}
+            - Năm Cá Nhân: ${numerologyResults.personalYear}
+            - Tháng Cá Nhân: ${numerologyResults.personalMonth}
+            - Ngày Cá Nhân: ${numerologyResults.personalDay}
+            - Số Thiếu: ${numerologyResults.missingNumbers.join(', ')}
+            - Đam Mê: ${numerologyResults.passion}
+            - Chặng: ${numerologyResults.chang1}, ${numerologyResults.chang2}, ${numerologyResults.chang3}, ${numerologyResults.chang4}
+            - Thách Thức: ${numerologyResults.challenge1}, ${numerologyResults.challenge2}, ${numerologyResults.challenge3}, ${numerologyResults.challenge4}
             Câu hỏi: ${message}`;
 
             const url = "https://api.cohere.com/v1/chat";
@@ -750,7 +757,6 @@
                 });
 
                 const result = await response.json();
-                console.log(result);
                 return result.text;
             } catch (error) {
                 console.error("Lỗi khi gọi API Cohere:", error);
@@ -1372,11 +1378,13 @@
         ];
 
         // Lấy mô tả cho từng số
+        // Lấy mô tả cho từng số
         async function getNumberDescription(number, aspect) {
             if (!numerologyResults) return "Vui lòng tính toán các chỉ số trước.";
-            
-            const context = `Bạn là một chuyên gia Numerology. Hãy mô tả ý nghĩa và đặc điểm của ${aspect} số ${number} trong thần số học bằng tiếng Việt. Nội dung cần ngắn gọn (khoảng 150-200 từ), có tính giáo dục và sâu sắc.`;
-            
+
+            // Tùy chỉnh mô tả dựa trên khái niệm Cây Cuộc Đời và năng lượng số
+            const context = `Bạn là một chuyên gia Thần Số Học. Hãy mô tả ý nghĩa của ${aspect} số ${number} trong Thần Số Học bằng tiếng Việt, ngắn gọn (150-200 từ), sâu sắc, và giáo dục. Tích hợp khái niệm "Cây Cuộc Đời" (Rễ: tố chất bẩm sinh, Thân: bài học Đường Đời, Tán: Sứ Mệnh) để giải thích ý nghĩa. Đề cập đến năng lượng chuẩn, ngược, quá mức của số này, nghiệp/phước liên quan, và cách áp dụng thực tiễn (ví dụ: chọn ngày số phù hợp, thiền, phóng sinh, biết ơn). Nếu là số chủ (11, 22, 33), nhấn mạnh ý nghĩa đặc biệt.`;
+
             const url = "https://api.cohere.com/v1/chat";
             const data = {
                 model: "command-r-plus",
@@ -1384,7 +1392,7 @@
                 temperature: 0.7,
                 max_tokens: 300,
             };
-            
+
             try {
                 const response = await fetch(url, {
                     method: "POST",
@@ -1394,7 +1402,7 @@
                     },
                     body: JSON.stringify(data),
                 });
-                
+
                 const result = await response.json();
                 return result.text;
             } catch (error) {
@@ -1448,23 +1456,38 @@
             container.innerHTML = svgContent;
         }
 
-        // Tạo biểu đồ đường đơn giản bằng SVG
         function createSimpleLineChart(containerId, data, title) {
             const container = document.getElementById(containerId);
-            const width = container.clientWidth - 40;
-            const height = 220;
             
+            // Kiểm tra xem container có tồn tại và có chiều rộng hợp lệ không
+            if (!container) {
+                console.error(`Container với ID ${containerId} không tồn tại.`);
+                return;
+            }
+            
+            // Đảm bảo chiều rộng không âm, sử dụng giá trị mặc định nếu cần
+            const defaultWidth = 300; // Chiều rộng mặc định
+            const width = Math.max(container.clientWidth - 40, defaultWidth); // Đảm bảo width không âm
+            const height = 220;
+
+            // Kiểm tra dữ liệu đầu vào
+            if (!data || data.length === 0) {
+                console.error("Dữ liệu biểu đồ rỗng hoặc không hợp lệ.");
+                container.innerHTML = `<p>Không có dữ liệu để hiển thị biểu đồ.</p>`;
+                return;
+            }
+
             let svgContent = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`;
             
             // Vẽ tiêu đề
             svgContent += `<text x="${width/2}" y="20" text-anchor="middle" fill="white" font-size="16">${title}</text>`;
             
             // Tìm giá trị lớn nhất để tỉ lệ
-            const maxValue = Math.max(...data.map(item => item.value));
+            const maxValue = Math.max(...data.map(item => item.value)) || 1; // Tránh chia cho 0
             
             // Vẽ đường
             let pathData = '';
-            const pointSpacing = width / (data.length - 1);
+            const pointSpacing = data.length > 1 ? width / (data.length - 1) : width; // Tránh lỗi khi chỉ có 1 điểm
             
             data.forEach((item, index) => {
                 const x = index * pointSpacing;
@@ -1620,10 +1643,10 @@
             
             // Tạo biểu đồ thách thức
             const challengesData = [
-                { label: 'C1', value: numerologyResults.challenge1 },
-                { label: 'C2', value: numerologyResults.challenge2 },
-                { label: 'C3', value: numerologyResults.challenge3 },
-                { label: 'C4', value: numerologyResults.challenge4 }
+                { label: 'C1', value: numerologyResults.challenge1 || 0 },
+                { label: 'C2', value: numerologyResults.challenge2 || 0 },
+                { label: 'C3', value: numerologyResults.challenge3 || 0 },
+                { label: 'C4', value: numerologyResults.challenge4 || 0 }
             ];
             createSimpleLineChart('challenges-chart', challengesData, 'Thách thức');
             
@@ -1766,6 +1789,7 @@
             container.innerHTML = svgContent;
         }
         // Hàm hiển thị nội dung 8 bước kỹ thuật liên kết
+        // Hàm hiển thị nội dung 8 bước kỹ thuật liên kết
         async function populateLifeJourneySteps() {
             const container = document.getElementById('life-journey-steps');
             if (!numerologyResults) {
@@ -1775,146 +1799,96 @@
 
             const steps = [];
 
-            // B1: Xuất phát từ chỉ số linh hồn
+            // B1: Công nhận năng lượng độc đáo (Linh Hồn)
             const soulDesc = await getNumberDescription(numerologyResults.soulValue, 'linh hồn');
             steps.push(`
-                <h4>Bước 1: Khát khao sâu thẳm bên trong bạn (Chỉ số Linh hồn)</h4>
-                <p>Chúc mừng bạn! Chỉ số Linh hồn của bạn là <strong>${numerologyResults.soulValue}</strong>. Đây là khát khao sâu thẳm bên trong bạn, điều mà bạn luôn khao khát đạt được trong cuộc đời.</p>
+                <h4>Bước 1: Công nhận năng lượng độc đáo của bạn (Chỉ số Linh Hồn)</h4>
+                <p>Chúc mừng bạn! Chỉ số Linh Hồn <strong>${numerologyResults.soulValue}</strong> thể hiện khát khao sâu thẳm trong bạn – phần "Rễ" của Cây Cuộc Đời, nguồn năng lượng bẩm sinh định hình con người bạn.</p>
                 <p>${soulDesc}</p>
+                <p><strong>Lời khuyên:</strong> Hãy thực hành thiền Ho'oponopono 15 phút mỗi ngày và chọn ngày số ${numerologyResults.soulValue} để khởi đầu các hoạt động quan trọng.</p>
             `);
 
-            // B2: Cần tốt nghiệp bài học (Chỉ số Đường đời)
+            // B2: Bài học cần vượt qua (Đường Đời)
             const lifepathDesc = await getNumberDescription(numerologyResults.birthValue, 'đường đời');
             steps.push(`
-                <h4>Bước 2: Trở thành người bạn cần (Chỉ số Đường đời)</h4>
-                <p>Trên hành trình đó, bạn cần trở thành một người phù hợp với bài học của chỉ số Đường đời: <strong>${numerologyResults.birthValue}</strong>.</p>
+                <h4>Bước 2: Vượt qua bài học của Thân cây (Chỉ số Đường Đời)</h4>
+                <p>Chỉ số Đường Đời <strong>${numerologyResults.birthValue}</strong> là bài học cốt lõi bạn cần tốt nghiệp – phần "Thân" của Cây Cuộc Đời, nơi bạn rèn luyện để trưởng thành.</p>
                 <p>${lifepathDesc}</p>
+                <p><strong>Lời khuyên:</strong> Tập trung vào các ngày số ${numerologyResults.birthValue} để ra quyết định lớn và thực hành biết ơn 10 điều mỗi ngày.</p>
             `);
 
-            // B3: Tốt nghiệp chỉ số Liên kết
+            // B3: Bài học Liên Kết
             const linkDesc = await getNumberDescription(numerologyResults.linkValue, 'liên kết');
             steps.push(`
-                <h4>Bước 3: Tốt nghiệp bài học Liên kết</h4>
-                <p>Để làm được điều đó, bạn cần tốt nghiệp bài học của chỉ số Liên kết: <strong>${numerologyResults.linkValue}</strong>.</p>
+                <h4>Bước 3: Tốt nghiệp bài học Liên Kết</h4>
+                <p>Chỉ số Liên Kết <strong>${numerologyResults.linkValue}</strong> là cầu nối giữa Đường Đời và Sứ Mệnh, giúp bạn cân bằng năng lượng để tiến tới mục tiêu lớn.</p>
                 <p>${linkDesc}</p>
+                <p><strong>Lời khuyên:</strong> Chọn ngày số ${numerologyResults.linkValue} để giải quyết xung đột và thực hành phóng sinh vào ngày số 7 cá nhân.</p>
             `);
 
-            // B4: Hoàn thành Sứ mệnh
+            // B4: Hoàn thành Sứ Mệnh (Tán cây)
             const destinyDesc = await getNumberDescription(numerologyResults.finalSum, 'sứ mệnh');
             steps.push(`
-                <h4>Bước 4: Hoàn thành Sứ mệnh của bạn</h4>
-                <p>Khi vượt qua được bài học liên kết, bạn sẽ hoàn thành sứ mệnh của mình với chỉ số Sứ mệnh: <strong>${numerologyResults.finalSum}</strong>.</p>
+                <h4>Bước 4: Hoàn thành Sứ Mệnh – Tán cây</h4>
+                <p>Chỉ số Sứ Mệnh <strong>${numerologyResults.finalSum}</strong> là mục đích sống của bạn – phần "Tán" của Cây Cuộc Đời, nơi bạn cống hiến cho xã hội.</p>
                 <p>${destinyDesc}</p>
+                <p><strong>Lời khuyên:</strong> Dành ngày số ${numerologyResults.finalSum} để thực hiện các dự án cộng đồng và chép kinh Đại Bi 108 ngày.</p>
             `);
 
-            // B5: Tốt nghiệp chỉ số thiếu
+            // B5: Tốt nghiệp số thiếu
             steps.push(`
-                <h4>Bước 5: Tốt nghiệp chỉ số thiếu</h4>
-                <p>Ngoài ra, bạn cần chú ý đến các chỉ số thiếu: <strong>${numerologyResults.missingNumbers.join(', ')}</strong>.</p>
-                <p>Những con số này đại diện cho các kỹ năng và nguồn lực bạn cần phát triển. Hãy tập trung cải thiện những khía cạnh này để cân bằng năng lượng của bạn.</p>
+                <h4>Bước 5: Tốt nghiệp các số thiếu</h4>
+                <p>Các số thiếu <strong>${numerologyResults.missingNumbers.join(', ')}</strong> là những bài học bạn cần bổ sung để cân bằng năng lượng.</p>
+                <p>Những con số này đại diện cho các kỹ năng hoặc phẩm chất bạn cần phát triển để hoàn thiện bản thân.</p>
+                <p><strong>Lời khuyên:</strong> Thực hành thiền và viết nhật ký biết ơn để phát triển các số thiếu, đặc biệt vào các ngày số ${numerologyResults.missingNumbers[0] || '4'}.</p>
             `);
 
-            // B6: Chia sẻ chỉ số Chặng/Thách thức hiện tại
+            // B6: Chặng và Thách thức hiện tại
             const currentYear = new Date().getFullYear();
             let currentStage = '';
             let currentChallenge = '';
+            let currentAgeRange = '';
             if (currentYear <= numerologyResults.cyear1) {
                 currentStage = numerologyResults.chang1;
                 currentChallenge = numerologyResults.challenge1;
+                currentAgeRange = `0 - ${numerologyResults.age1}`;
             } else if (currentYear <= numerologyResults.cyear2) {
                 currentStage = numerologyResults.chang2;
                 currentChallenge = numerologyResults.challenge2;
+                currentAgeRange = `${numerologyResults.age1 + 1} - ${numerologyResults.age2}`;
             } else if (currentYear <= numerologyResults.cyear3) {
                 currentStage = numerologyResults.chang3;
                 currentChallenge = numerologyResults.challenge3;
+                currentAgeRange = `${numerologyResults.age2 + 1} - ${numerologyResults.age3}`;
             } else {
                 currentStage = numerologyResults.chang4;
                 currentChallenge = numerologyResults.challenge4;
+                currentAgeRange = `${numerologyResults.age3 + 1}+`;
             }
             const stageDesc = await getNumberDescription(currentStage, 'chặng hiện tại');
             const challengeDesc = await getNumberDescription(currentChallenge, 'thách thức hiện tại');
             steps.push(`
                 <h4>Bước 6: Chặng và Thách thức hiện tại</h4>
-                <p>Hiện tại, bạn đang ở chặng: <strong>${currentStage}</strong> với thách thức: <strong>${currentChallenge}</strong>.</p>
+                <p>Bạn đang ở chặng <strong>${currentStage}</strong> (tuổi ${currentAgeRange}) với thách thức <strong>${currentChallenge}</strong>.</p>
                 <p><strong>Chặng hiện tại:</strong> ${stageDesc}</p>
                 <p><strong>Thách thức hiện tại:</strong> ${challengeDesc}</p>
+                <p><strong>Lời khuyên:</strong> Tập trung vào ngày số ${currentStage} để phát huy năng lượng và thực hành phóng sinh vào ngày số 7 để hóa giải nghiệp.</p>
             `);
 
-            // B7: Định hướng nghề nghiệp qua chỉ số Trưởng thành
+            // B7: Định hướng nghề nghiệp (Trưởng Thành)
             const maturityDesc = await getNumberDescription(numerologyResults.maturityValue, 'trưởng thành');
             steps.push(`
-                <h4>Bước 7: Định hướng nghề nghiệp (Chỉ số Trưởng thành)</h4>
-                <p>Chỉ số Trưởng thành của bạn là: <strong>${numerologyResults.maturityValue}</strong>. Đây là định hướng nghề nghiệp và sự phát triển lâu dài của bạn.</p>
+                <h4>Bước 7: Định hướng nghề nghiệp (Chỉ số Trưởng Thành)</h4>
+                <p>Chỉ số Trưởng Thành <strong>${numerologyResults.maturityValue}</strong> định hướng sự nghiệp và sự phát triển lâu dài của bạn, đặc biệt trong giai đoạn đỉnh cao.</p>
                 <p>${maturityDesc}</p>
+                <p><strong>Lời khuyên:</strong> Chọn ngày số ${numerologyResults.maturityValue} để lập kế hoạch nghề nghiệp và thực hành gieo hạt tài chính (50% gia đình, 20% người ảnh hưởng, 15% từ thiện).</p>
             `);
 
-            // B8: Chúc mừng và xin cảm nhận
+            // B8: Kết nối và chuyển hóa
             steps.push(`
-                <h4>Bước 8: Chúc mừng bạn!</h4>
-                <p>Chúc mừng bạn đã nhìn thấy hành trình cuộc đời của mình! Bạn cảm nhận như thế nào về hành trình này? Hãy chia sẻ cảm nhận của bạn nhé!</p>
-            `);
-
-            container.innerHTML = steps.join('');
-        }
-        // Hàm hiển thị nội dung 8 bước coach phễu
-        function populateCoachFunnelSteps() {
-            const container = document.getElementById('coach-funnel-steps');
-            const steps = [];
-
-            // B1: Chào hỏi
-            steps.push(`
-                <h4>Bước 1: Chào hỏi và tạo thiện cảm</h4>
-                <p>Xin chào bạn! Mình rất vui được gặp bạn hôm nay. Bạn có thể chia sẻ một chút về công việc, gia đình và cuộc sống hiện tại của bạn không? Mình muốn tìm hiểu thêm để có thể hỗ trợ bạn tốt nhất.</p>
-            `);
-
-            // B2: Giới thiệu bản thân
-            steps.push(`
-                <h4>Bước 2: Giới thiệu bản thân</h4>
-                <p>Mình là chuyên gia Life Coach của Gein Academy, đồng thời là chuyên viên phát triển bản thân. Hôm nay, chúng ta có duyên gặp nhau, mình có thể dành 10 phút để chia sẻ về hành trình cuộc đời của bạn không? Nếu bạn bận, chúng ta có thể hẹn lại sau nhé!</p>
-            `);
-
-            // B3: Hỏi về Thần số học (TSH) hoặc Map For Success (MFS)
-            steps.push(`
-                <h4>Bước 3: Tìm hiểu về hiểu biết của bạn với Thần số học</h4>
-                <p>Bạn đã từng nghe về Thần số học (TSH) hoặc Map For Success (MFS) chưa? Nếu có, bạn biết qua đâu? Nếu chưa, mình sẽ chia sẻ thêm cho bạn nhé!</p>
-                <p>Mình có một năng lực cảm nhận đặc biệt và đã chiêm nghiệm rất sâu về Thần số học. Mình đề nghị bạn ghi âm phiên coach này để có thể nghe lại và cảm nhận sự khác biệt.</p>
-            `);
-
-            // B4: Hỏi thông tin của khách hàng
-            steps.push(`
-                <h4>Bước 4: Xác nhận thông tin của bạn</h4>
-                <p>Mình đã có thông tin của bạn: Họ tên, ngày tháng năm sinh. Bạn có muốn mình phân tích thêm về hành trình cuộc đời của bạn không?</p>
-            `);
-
-            // B5: Chia sẻ tam giác vàng
-            steps.push(`
-                <h4>Bước 5: Chia sẻ tam giác vàng</h4>
-                <p>Chúc mừng bạn! Chỉ số Đường đời của bạn là <strong>${numerologyResults.birthValue}</strong>. Đây là chỉ số chiếm 50% tính cách và bài học của bạn. Chỉ số Liên kết của bạn là <strong>${numerologyResults.linkValue}</strong>, thể hiện cầu nối giữa Đường đời và Sứ mệnh.</p>
-            `);
-
-            // B6: Định hướng nghề nghiệp
-            steps.push(`
-                <h4>Bước 6: Định hướng nghề nghiệp</h4>
-                <p>Dựa trên chỉ số Năm cá nhân (<strong>${numerologyResults.personalYear}</strong>) và Tháng cá nhân (<strong>${numerologyResults.personalMonth}</strong>), bạn đang ở giai đoạn phát triển năng lực tích cực. Đây là thời điểm để bạn tập trung vào những phẩm chất tốt đẹp và phát triển bản thân.</p>
-            `);
-
-            // B7: Giới thiệu về MFS
-            steps.push(`
-                <h4>Bước 7: Giới thiệu về Map For Success (MFS)</h4>
-                <p>MFS là một công cụ giúp bạn vẽ ra bức tranh cuộc đời, từ đó tìm ra hướng đi đúng đắn. Có một khách hàng của mình, sau khi sử dụng MFS, đã chuyển hóa từ một người thiếu định hướng thành một người tự tin, thành công trong sự nghiệp. Bạn có muốn sở hữu một tấm bản đồ như vậy không?</p>
-            `);
-
-            // B8: Trao giá trị của MFS
-            steps.push(`
-                <h4>Bước 8: Trao giá trị của MFS</h4>
-                <ul>
-                    <li>Bạn sẽ nhận được 1 tấm bản đồ cứng và 1 bản mềm.</li>
-                    <li>Được coach 3-4 giờ để hiểu rõ hành trình của mình.</li>
-                    <li>Vẽ bức tranh cuộc đời trong tương lai.</li>
-                    <li>Được đồng hành từ 3-6 tháng đến 1 năm.</li>
-                    <li>Có giải pháp hành trình tẩy hạt, trả nghiệp để chuyển hóa.</li>
-                </ul>
-                <p>Chúng mình không chỉ bán Thần số học, mà bán sự chuyển hóa của bạn. Nếu bạn cam kết đồng hành cùng mình trong 9 ngày, mình sẽ dồn hết sức để giúp bạn!</p>
+                <h4>Bước 8: Kết nối và chuyển hóa</h4>
+                <p>Chúc mừng bạn đã khám phá Cây Cuộc Đời! Hành trình này giúp bạn hiểu rõ bản thân, vượt qua nghiệp, và tích lũy phước. Hãy thực hành đều đặn các phương pháp như thiền, phóng sinh, và biết ơn để chuyển hóa năng lượng.</p>
+                <p><strong>Lời khuyên:</strong> Cam kết thực hành 9 ngày liên tục, đặc biệt vào ngày số ${numerologyResults.personalDay}, để kết nối năng lượng và đạt được sự cân bằng.</p>
             `);
 
             container.innerHTML = steps.join('');
