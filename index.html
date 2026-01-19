@@ -670,8 +670,7 @@
 
     <script>
         let numerologyResults = null; // Biến toàn cục để lưu kết quả
-        // API Key của Cohere (thay thế bằng API Key của bạn)
-        const COHERE_API_KEY = "MSOBN7nu1Fp1sufFz22AQILk03LzhaHNt9QJqYIc"; // Thay YOUR_COHERE_API_KEY bằng API Key thực tế
+        const GEMINI_API_KEY = "AIzaSyDGsF9P5MF_Y3E798Bt4Q2E6ytkXL9-3Nw";
 
         // Hiển thị/ẩn khung chat
         function toggleChat() {
@@ -715,13 +714,12 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // Gọi API Cohere để nhận phản hồi
+        // Gọi API Gemini để nhận phản hồi
         async function getCohereResponse(message) {
             if (!numerologyResults) {
                 return "Vui lòng tính toán các chỉ số trước khi hỏi.";
             }
-
-            // Cập nhật context để yêu cầu trả lời giống tài liệu, sử dụng khái niệm Cây Cuộc Đời và năng lượng số
+        
             const context = `Bạn là một chuyên gia Thần Số Học. Hãy trả lời câu hỏi sau bằng tiếng Việt, ngắn gọn (150-200 từ), dễ hiểu, sâu sắc, theo phong cách giáo dục và tích hợp khái niệm "Cây Cuộc Đời" (Rễ: tố chất bẩm sinh, Thân: bài học Đường Đời, Tán: Sứ Mệnh). Câu trả lời cần đề cập đến cách áp dụng năng lượng số trong đời sống, nghiệp và phước liên quan, đồng thời đưa ra lời khuyên thực hành (ví dụ: thiền, phóng sinh, biết ơn). Các chỉ số Numerology của người hỏi là:
             - Đường Đời: ${numerologyResults.birthValue}
             - Sứ Mệnh: ${numerologyResults.finalSum}
@@ -737,29 +735,34 @@
             - Chặng: ${numerologyResults.chang1}, ${numerologyResults.chang2}, ${numerologyResults.chang3}, ${numerologyResults.chang4}
             - Thách Thức: ${numerologyResults.challenge1}, ${numerologyResults.challenge2}, ${numerologyResults.challenge3}, ${numerologyResults.challenge4}
             Câu hỏi: ${message}`;
-
-            const url = "https://api.cohere.com/v1/chat";
+        
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
+            
             const data = {
-                model: "command-r-plus",
-                message: context,
-                temperature: 0.7,
-                max_tokens: 500,
+                contents: [{
+                    parts: [{
+                        text: context
+                    }]
+                }],
+                generationConfig: {
+                    temperature: 0.7,
+                    maxOutputTokens: 500,
+                }
             };
-
+        
             try {
                 const response = await fetch(url, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer ${COHERE_API_KEY}`,
                     },
                     body: JSON.stringify(data),
                 });
-
+        
                 const result = await response.json();
-                return result.text;
+                return result.candidates[0].content.parts[0].text;
             } catch (error) {
-                console.error("Lỗi khi gọi API Cohere:", error);
+                console.error("Lỗi khi gọi API Gemini:", error);
                 return "Xin lỗi, tôi không thể kết nối đến AI ngay lúc này.";
             }
         }
@@ -1381,30 +1384,34 @@
         // Lấy mô tả cho từng số
         async function getNumberDescription(number, aspect) {
             if (!numerologyResults) return "Vui lòng tính toán các chỉ số trước.";
-
-            // Tùy chỉnh mô tả dựa trên khái niệm Cây Cuộc Đời và năng lượng số
+        
             const context = `Bạn là một chuyên gia Thần Số Học. Hãy mô tả ý nghĩa của ${aspect} số ${number} trong Thần Số Học bằng tiếng Việt, ngắn gọn (150-200 từ), sâu sắc, và giáo dục. Tích hợp khái niệm "Cây Cuộc Đời" (Rễ: tố chất bẩm sinh, Thân: bài học Đường Đời, Tán: Sứ Mệnh) để giải thích ý nghĩa. Đề cập đến năng lượng chuẩn, ngược, quá mức của số này, nghiệp/phước liên quan, và cách áp dụng thực tiễn (ví dụ: chọn ngày số phù hợp, thiền, phóng sinh, biết ơn). Nếu là số chủ (11, 22, 33), nhấn mạnh ý nghĩa đặc biệt.`;
-
-            const url = "https://api.cohere.com/v1/chat";
+        
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
+            
             const data = {
-                model: "command-r-plus",
-                message: context,
-                temperature: 0.7,
-                max_tokens: 300,
+                contents: [{
+                    parts: [{
+                        text: context
+                    }]
+                }],
+                generationConfig: {
+                    temperature: 0.7,
+                    maxOutputTokens: 300,
+                }
             };
-
+        
             try {
                 const response = await fetch(url, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer ${COHERE_API_KEY}`,
                     },
                     body: JSON.stringify(data),
                 });
-
+        
                 const result = await response.json();
-                return result.text;
+                return result.candidates[0].content.parts[0].text;
             } catch (error) {
                 console.error("Lỗi khi lấy mô tả:", error);
                 return "Không thể lấy mô tả vào lúc này.";
