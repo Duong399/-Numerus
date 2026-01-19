@@ -715,6 +715,7 @@
         }
 
         // Gọi API Gemini để nhận phản hồi
+        // Gọi API Gemini để nhận phản hồi
         async function getCohereResponse(message) {
             if (!numerologyResults) {
                 return "Vui lòng tính toán các chỉ số trước khi hỏi.";
@@ -760,7 +761,22 @@
                 });
         
                 const result = await response.json();
-                return result.candidates[0].content.parts[0].text;
+                
+                // Kiểm tra lỗi từ API
+                if (result.error) {
+                    console.error("Gemini API Error:", result.error);
+                    return `Lỗi API: ${result.error.message || 'Không xác định'}`;
+                }
+                
+                // Kiểm tra cấu trúc response
+                if (result.candidates && result.candidates[0] && 
+                    result.candidates[0].content && result.candidates[0].content.parts && 
+                    result.candidates[0].content.parts[0]) {
+                    return result.candidates[0].content.parts[0].text;
+                } else {
+                    console.error("Unexpected response structure:", result);
+                    return "Xin lỗi, không thể nhận được phản hồi từ AI.";
+                }
             } catch (error) {
                 console.error("Lỗi khi gọi API Gemini:", error);
                 return "Xin lỗi, tôi không thể kết nối đến AI ngay lúc này.";
@@ -1411,7 +1427,22 @@
                 });
         
                 const result = await response.json();
-                return result.candidates[0].content.parts[0].text;
+                
+                // Kiểm tra lỗi từ API
+                if (result.error) {
+                    console.error("Gemini API Error:", result.error);
+                    return "Không thể lấy mô tả vào lúc này.";
+                }
+                
+                // Kiểm tra cấu trúc response
+                if (result.candidates && result.candidates[0] && 
+                    result.candidates[0].content && result.candidates[0].content.parts && 
+                    result.candidates[0].content.parts[0]) {
+                    return result.candidates[0].content.parts[0].text;
+                } else {
+                    console.error("Unexpected response structure:", result);
+                    return "Không thể lấy mô tả vào lúc này.";
+                }
             } catch (error) {
                 console.error("Lỗi khi lấy mô tả:", error);
                 return "Không thể lấy mô tả vào lúc này.";
