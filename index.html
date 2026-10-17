@@ -427,6 +427,876 @@
         }
 
     </style>
+    <style>
+/* ===== Numerus glass UI layer ===== */
+/* ==========================================================================
+   Numerus — glass / bubble UI layer
+   --------------------------------------------------------------------------
+   Additive stylesheet. Every override is prefixed with `html body` so it wins
+   over the original rules regardless of load order; the original file's logic
+   and markup are untouched.
+
+   Motion patterns adapted from Kinetics by Colorion (kinetics.colorion.co),
+   CSS snippets only, re-implemented here (no dependency):
+     Liquid Glass Press, Squish Button, Tab Pill Glide / Snap Rail,
+     Stagger Entrance, Ripple Feedback, Toast Overshoot, Undo Snackbar,
+     Delayed Tooltip, Shimmer Skeleton, Typing Indicator, Badge Counter,
+     Hold to Confirm, Tag Input (pop out), Magnetic Button, Odometer Count-up.
+   Star field, nebula and the pointer spotlight are original work.
+   ========================================================================== */
+
+:root {
+  --nx-spring: cubic-bezier(.34, 1.56, .64, 1);
+  --nx-glide: cubic-bezier(.16, 1, .3, 1);
+  --nx-over: cubic-bezier(.18, 1.25, .4, 1);
+  --nx-ease: cubic-bezier(.65, 0, .35, 1);
+  --nx-violet: #b37aef;
+  --nx-line: rgba(255, 255, 255, .18);
+  --nx-glass: linear-gradient(150deg, rgba(255, 255, 255, .18), rgba(255, 255, 255, .05));
+  --nx-shadow: 0 24px 60px rgba(10, 0, 40, .45);
+  --px: 0;
+  --py: 0;
+}
+
+/* ---------- Page + animated background ---------- */
+
+html body {
+  background-color: #0d0720;
+  background-attachment: fixed;
+  background-position: center;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color-scheme: dark;
+}
+
+.nx-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  pointer-events: none;
+  background: radial-gradient(120% 90% at 50% 0%, rgba(11, 8, 24, .94) 0%, rgba(4, 3, 10, .96) 55%, rgba(1, 1, 3, .98) 100%);
+}
+
+/* faint Milky Way band */
+.nx-bg::after {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background: linear-gradient(115deg, transparent 38%, rgba(120, 100, 220, .06) 47%, rgba(190, 170, 255, .08) 50%, rgba(120, 100, 220, .06) 53%, transparent 62%);
+  filter: blur(30px);
+  transform: rotate(-8deg);
+}
+
+/* dark nebula clouds */
+.nx-orb {
+  position: absolute;
+  width: var(--s);
+  height: var(--s);
+  border-radius: 50%;
+  background: radial-gradient(circle, hsl(var(--h) 65% 42% / .5), transparent 68%);
+  filter: blur(90px);
+  opacity: .3;
+  will-change: transform;
+  animation: nx-drift 40s ease-in-out infinite alternate;
+}
+
+.nx-stars { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+@keyframes nx-drift {
+  from { transform: translate3d(-4%, -3%, 0) scale(1); }
+  to   { transform: translate3d(5%, 6%, 0) scale(1.12); }
+}
+
+/* ---------- Main glass card ----------
+   The blur lives on a pseudo-element on purpose: backdrop-filter / transform on
+   .container itself would turn it into the containing block of every
+   position:fixed child (chat, Zalo, Messenger, modal). */
+
+html body .container {
+  position: relative;
+  max-width: 800px;
+  margin: clamp(16px, 5vw, 50px) auto;
+  padding: clamp(16px, 4vw, 28px);
+  background: transparent;
+  border: 1px solid var(--nx-line);
+  border-radius: 32px;
+  box-shadow: var(--nx-shadow), inset 0 1px 0 rgba(255, 255, 255, .25);
+}
+
+html body .container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background:
+    radial-gradient(120% 55% at 12% 0%, rgba(255, 255, 255, .2), transparent 50%),
+    linear-gradient(150deg, rgba(255, 255, 255, .13), rgba(255, 255, 255, .04) 45%, rgba(150, 130, 230, .06));
+  -webkit-backdrop-filter: blur(26px) saturate(1.7);
+  backdrop-filter: blur(26px) saturate(1.7);
+}
+
+html body h1 {
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  margin: .2em 0 .5em;
+  letter-spacing: .04em;
+  text-transform: capitalize;
+  background: linear-gradient(110deg, #fff, #e2c6ff 40%, #ff9be6 70%, #fff);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: nx-title 9s ease-in-out infinite alternate;
+}
+
+@keyframes nx-title {
+  from { background-position: 0% 0; }
+  to   { background-position: 100% 0; }
+}
+
+/* the two tiny inline-styled labels were 10px */
+html body .container > h2,
+html body .container > h3 {
+  font-size: .85rem !important;
+  font-weight: 500;
+  opacity: .78;
+  margin: 14px 0 2px;
+}
+
+/* ---------- Entrance (Stagger Entrance) ---------- */
+
+.nx-enter {
+  animation: nx-rise .8s var(--nx-glide) backwards;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+@keyframes nx-rise {
+  from { opacity: 0; transform: translateY(16px) scale(.96); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---------- Inputs ---------- */
+
+html body input,
+html body select {
+  box-sizing: border-box;
+  font: inherit;
+  color: #fff;
+  background: rgba(255, 255, 255, .08);
+  border: 1px solid var(--nx-line);
+  border-radius: 16px;
+  padding: 12px 14px;
+  outline: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12);
+  transition: border-color .25s, background .25s, box-shadow .35s var(--nx-spring), transform .35s var(--nx-spring);
+}
+
+html body input::placeholder { color: rgba(255, 255, 255, .55); }
+
+html body input:focus,
+html body select:focus {
+  border-color: rgba(200, 150, 255, .85);
+  background: rgba(255, 255, 255, .13);
+  box-shadow: 0 0 0 4px rgba(179, 122, 239, .25), inset 0 1px 0 rgba(255, 255, 255, .2);
+  transform: translateY(-1px);
+}
+
+html body select option { background: #1b1030; color: #fff; }
+
+html body .current-date-container input,
+html body .current-date-container select {
+  min-width: 0;
+  padding-inline: 6px;
+  font-size: .95rem;
+  text-align: center;
+  text-align-last: center; /* keep the selected value visible in narrow selects */
+}
+html body .current-date-container select { min-width: 64px; text-overflow: clip; }
+
+html body :is(button, input, select, [role="button"]):focus-visible {
+  outline: 2px solid rgba(255, 255, 255, .9);
+  outline-offset: 3px;
+}
+
+/* ---------- Primary buttons (Liquid Glass Press + Squish) ---------- */
+
+html body .nx-cta {
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  margin: 14px 5px 5px;
+  padding: 14px 18px;
+  color: #fff;
+  font: 600 1rem/1.2 inherit;
+  letter-spacing: .02em;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, .3);
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(179, 122, 239, .78), rgba(120, 80, 255, .55) 55%, rgba(255, 120, 220, .5));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), inset 0 -8px 18px rgba(80, 30, 160, .35), 0 12px 30px rgba(120, 60, 220, .4);
+  transition: transform .5s var(--nx-spring), box-shadow .3s;
+}
+
+html body .nx-cta::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, .42) 50%, transparent 70%);
+  transform: translateX(-120%);
+  transition: transform .65s var(--nx-glide);
+}
+
+html body .nx-cta:hover { transform: translateY(-2px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), inset 0 -8px 18px rgba(80, 30, 160, .3), 0 18px 40px rgba(140, 70, 240, .5); }
+html body .nx-cta:hover::after { transform: translateX(120%); }
+html body .nx-cta:active { transform: scale(.97); transition-duration: .08s; }
+
+/* ripple (Ripple Feedback) */
+.nx-rip {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .35);
+  pointer-events: none;
+  transform: scale(0);
+  animation: nx-ripple .6s ease-out forwards;
+}
+@keyframes nx-ripple { to { transform: scale(3); opacity: 0; } }
+
+/* ---------- Result bubbles ---------- */
+
+html body .result { gap: 12px; padding: 0; margin-top: 22px; }
+
+html body .result-item {
+  position: relative;
+  box-sizing: border-box;
+  min-width: 0;
+  padding: 12px 8px;
+  border-radius: 22px;
+  border: 1px solid var(--nx-line);
+  background: var(--nx-glass);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3), inset 0 -10px 20px rgba(130, 70, 220, .12), 0 8px 24px rgba(10, 0, 40, .28);
+  transition: transform .5s var(--nx-spring), box-shadow .3s, background .3s;
+  animation: nx-rise .7s var(--nx-glide) backwards;
+  animation-delay: calc(var(--i, 0) * 35ms);
+  animation-play-state: paused;
+}
+
+html body .result-item.nx-in { animation-play-state: running; }
+
+/* pointer-following specular highlight */
+html body .result-item::before,
+html body .number-card::before,
+.nx-hist-item::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(140px circle at var(--mx, 50%) var(--my, 0%), rgba(255, 255, 255, .28), transparent 65%);
+  transition: opacity .3s;
+}
+html body .result-item:hover::before,
+html body .number-card:hover::before,
+.nx-hist-item:hover::before { opacity: 1; }
+
+html body .result-item:hover {
+  z-index: 5;
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), 0 16px 36px rgba(140, 70, 240, .38);
+}
+
+html body .result-item strong {
+  display: block;
+  font-size: .74rem;
+  font-weight: 600;
+  line-height: 1.25;
+  opacity: .78;
+}
+
+.nx-val {
+  display: block;
+  margin-top: 4px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+  background: linear-gradient(180deg, #fff, #d9b8ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------- Tooltips (Delayed Tooltip: delay in, instant out) ---------- */
+
+html body .tooltip .tooltip-text {
+  width: max-content;
+  max-width: min(340px, 86vw);
+  box-sizing: border-box;
+  text-align: left;
+  font-size: .82rem;
+  line-height: 1.45;
+  border: 1px solid var(--nx-line);
+  border-radius: 18px;
+  background: rgba(24, 12, 48, .78);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  backdrop-filter: blur(20px) saturate(1.6);
+  box-shadow: 0 18px 44px rgba(8, 0, 30, .55), inset 0 1px 0 rgba(255, 255, 255, .22);
+  transform: translateX(-50%) translateY(6px) scale(.92);
+  transition: opacity .1s, transform .1s, visibility 0s .1s;
+}
+
+html body .tooltip .tooltip-text.nx-below { bottom: auto; top: 120%; transform-origin: top center; }
+
+html body .tooltip:hover .tooltip-text {
+  transform: translateX(-50%) translateY(0) scale(1);
+  transition: opacity .15s .2s, transform .35s var(--nx-spring) .2s, visibility 0s .2s;
+}
+
+html body .tooltip-text table { border-collapse: collapse; margin-top: 6px; font-size: .75rem; }
+html body .tooltip-text th,
+html body .tooltip-text td { border: 1px solid rgba(255, 255, 255, .22); padding: 3px 6px; text-align: center; }
+html body .tooltip-text p { margin: 3px 0; }
+
+/* ---------- Floating chat + social buttons ---------- */
+
+html body #chat-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 20px;
+  font-weight: 600;
+  user-select: none;
+  border: 1px solid rgba(255, 255, 255, .3);
+  background: linear-gradient(135deg, rgba(179, 122, 239, .85), rgba(255, 110, 210, .7));
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), 0 10px 30px rgba(140, 60, 220, .45);
+  translate: var(--tx, 0px) var(--ty, 0px);
+  transition: transform .5s var(--nx-spring), box-shadow .3s, translate .18s ease-out;
+}
+html body #chat-button:hover { background: linear-gradient(135deg, rgba(200, 150, 255, .95), rgba(255, 130, 220, .8)); transform: translateY(-3px) scale(1.04); }
+html body #chat-button:active { transform: scale(.95); transition-duration: .08s; }
+
+html body #zalo-button,
+html body #messenger-button {
+  background: rgba(255, 255, 255, .92);
+  box-shadow: 0 8px 24px rgba(10, 0, 40, .4), inset 0 1px 0 #fff;
+  transition: transform .5s var(--nx-spring), box-shadow .3s;
+}
+html body #zalo-button:hover,
+html body #messenger-button:hover { background: #fff; transform: translateY(-3px) scale(1.1); }
+
+/* The chat box takes over the corner (it used to sit under the Messenger button) */
+html body #chat-box {
+  right: 20px;
+  bottom: 20px;
+  width: min(340px, calc(100vw - 40px));
+  height: min(480px, calc(100vh - 40px));
+  z-index: 1001;
+  overflow: hidden;
+  transform-origin: bottom right;
+  border: 1px solid rgba(255, 255, 255, .22);
+  border-radius: 26px;
+  background: rgba(30, 15, 60, .55);
+  -webkit-backdrop-filter: blur(26px) saturate(1.6);
+  backdrop-filter: blur(26px) saturate(1.6);
+  box-shadow: 0 30px 70px rgba(8, 0, 30, .6), inset 0 1px 0 rgba(255, 255, 255, .3);
+}
+html body #chat-box[style*="flex"] { animation: nx-bloom .5s var(--nx-over); }
+@keyframes nx-bloom { from { opacity: 0; transform: translateY(20px) scale(.85); } to { opacity: 1; transform: none; } }
+
+html body #chat-header {
+  gap: 8px;
+  padding: 14px 16px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, .1);
+  border-radius: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, .12);
+}
+html body #chat-header span { flex: 1; }
+
+html body #close-chat,
+.nx-chat-clear {
+  position: static;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin: 0;
+  padding: 0;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: #fff;
+  cursor: pointer;
+  border: 1px solid var(--nx-line);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .12);
+  transition: transform .4s var(--nx-spring), background .2s;
+}
+html body #close-chat:hover,
+.nx-chat-clear:hover { background: rgba(255, 255, 255, .24); transform: scale(1.12) rotate(90deg); }
+
+html body #chat-body { padding: 12px; background: transparent; scrollbar-width: thin; }
+html body #chat-messages { gap: 10px; }
+
+html body .message {
+  max-width: 85%;
+  padding: 9px 14px;
+  font-size: .92rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  animation: nx-pop .45s var(--nx-spring);
+}
+html body .message.user { color: #fff; background: linear-gradient(135deg, #b37aef, #8c5af0); border-radius: 18px 18px 6px 18px; box-shadow: 0 6px 16px rgba(120, 60, 220, .4); }
+html body .message.bot { color: #fff; background: rgba(255, 255, 255, .14); border: 1px solid rgba(255, 255, 255, .14); border-radius: 18px 18px 18px 6px; }
+@keyframes nx-pop { from { opacity: 0; transform: scale(.8) translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* Typing Indicator */
+.message.nx-typing { display: flex; gap: 5px; align-items: center; padding: 12px 16px; }
+.message.nx-typing i { width: 7px; height: 7px; border-radius: 50%; background: #fff; opacity: .4; animation: nx-bounce 1.2s ease-in-out infinite; }
+.message.nx-typing i:nth-child(2) { animation-delay: .16s; }
+.message.nx-typing i:nth-child(3) { animation-delay: .32s; }
+@keyframes nx-bounce { 0%, 60%, 100% { transform: translateY(0); opacity: .4; } 30% { transform: translateY(-7px); opacity: 1; } }
+
+html body #chat-input-container {
+  gap: 8px;
+  padding: 10px;
+  background: rgba(255, 255, 255, .07);
+  border-top: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 0;
+}
+html body #chat-input {
+  min-width: 0;
+  padding: 11px 14px;
+  font-size: 1rem;
+  color: #fff;
+  background: rgba(255, 255, 255, .1);
+  border: 1px solid var(--nx-line);
+  border-radius: 14px;
+}
+html body #send-button {
+  position: relative;
+  overflow: hidden;
+  width: 64px;
+  margin: 0;
+  padding: 0 12px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, .3);
+  border-radius: 14px;
+  background: linear-gradient(135deg, #b37aef, #8c5af0);
+  transition: transform .5s var(--nx-spring);
+}
+html body #send-button:hover { background: linear-gradient(135deg, #c690ff, #9a6cff); transform: scale(1.05); }
+html body #send-button:active { transform: scale(.92); transition-duration: .08s; }
+
+/* ---------- Details modal ---------- */
+
+html body .modal-overlay {
+  background: rgba(12, 6, 30, .55);
+  -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  backdrop-filter: blur(14px) saturate(1.3);
+}
+html body .modal-overlay[style*="flex"] { animation: nx-fade .3s ease; }
+html body .modal-overlay[style*="flex"] .modal-content { animation: nx-sheet .6s var(--nx-over); }
+@keyframes nx-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes nx-sheet { from { opacity: 0; transform: translateY(24px) scale(.94); } to { opacity: 1; transform: none; } }
+
+html body .modal-content {
+  border: 1px solid rgba(255, 255, 255, .2);
+  border-radius: 32px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, .14), rgba(255, 255, 255, .04)), rgba(25, 15, 50, .64);
+  -webkit-backdrop-filter: blur(30px) saturate(1.6);
+  backdrop-filter: blur(30px) saturate(1.6);
+  box-shadow: 0 40px 90px rgba(8, 0, 30, .65), inset 0 1px 0 rgba(255, 255, 255, .3);
+  scrollbar-width: thin;
+}
+
+html body .close-modal {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  font-size: 1.4rem;
+  line-height: 1;
+  border: 1px solid var(--nx-line);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .12);
+  transition: transform .4s var(--nx-spring), background .2s;
+}
+html body .close-modal:hover { background: rgba(255, 255, 255, .24); transform: rotate(90deg) scale(1.1); }
+
+/* Tabs with a gliding pill (Tab Pill Glide / Snap Rail) */
+html body .detailed-tabs {
+  position: relative;
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .07);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+html body .detailed-tabs::-webkit-scrollbar { display: none; }
+
+html body .tab-button {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  width: auto;
+  margin: 0;
+  padding: 9px 16px;
+  font: inherit;
+  font-size: .9rem;
+  color: #fff;
+  cursor: pointer;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  opacity: .65;
+  transition: opacity .25s;
+}
+html body .tab-button:hover { opacity: .95; }
+html body .tab-button.active { opacity: 1; border-bottom: 0; }
+
+.nx-pill {
+  position: absolute;
+  z-index: 0;
+  top: 4px;
+  bottom: 4px;
+  left: 0;
+  width: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .3);
+  background: linear-gradient(135deg, rgba(179, 122, 239, .78), rgba(130, 90, 255, .55));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), 0 6px 18px rgba(120, 60, 220, .35);
+  transition: translate .45s var(--nx-spring), width .4s var(--nx-ease);
+}
+
+html body .tab-content {
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, .05);
+}
+html body .tab-content.active { animation: nx-rise .5s var(--nx-glide); }
+html body .tab-content p { line-height: 1.7; }
+
+html body .number-card {
+  position: relative;
+  border: 1px solid var(--nx-line);
+  border-radius: 20px;
+  background: var(--nx-glass);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25);
+  transition: transform .45s var(--nx-spring), background .3s, box-shadow .3s;
+}
+html body .number-card:hover { background: rgba(179, 122, 239, .25); transform: translateY(-5px); box-shadow: 0 14px 30px rgba(120, 60, 220, .35); }
+html body .tab-content.active .number-card { animation: nx-rise .6s var(--nx-glide) backwards; }
+html body .number-card:nth-child(2) { animation-delay: .05s; }
+html body .number-card:nth-child(3) { animation-delay: .1s; }
+html body .number-card:nth-child(4) { animation-delay: .15s; }
+html body .number-card:nth-child(5) { animation-delay: .2s; }
+html body .number-card:nth-child(6) { animation-delay: .25s; }
+html body .number-card:nth-child(7) { animation-delay: .3s; }
+html body .number-card:nth-child(8) { animation-delay: .35s; }
+html body .number-card:nth-child(9) { animation-delay: .4s; }
+
+html body .chart-container { border: 1px solid rgba(255, 255, 255, .08); border-radius: 20px; }
+
+html body .pyramid-cell {
+  background: radial-gradient(circle at 30% 25%, rgba(255, 255, 255, .45), rgba(255, 255, 255, .08) 45%, rgba(179, 122, 239, .2));
+  border: 1px solid rgba(255, 255, 255, .22);
+  box-shadow: inset 0 -4px 8px rgba(120, 60, 220, .25);
+}
+
+html body .life-journey-steps,
+html body .coach-funnel-steps { border: 1px solid rgba(255, 255, 255, .1); border-radius: 20px; }
+
+/* Shimmer Skeleton while AI text is still loading */
+html body [id$="-description"]:empty,
+html body #life-journey-steps:empty {
+  min-height: 96px;
+  border-radius: 14px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, .06) 0%, rgba(255, 255, 255, .17) 20%, rgba(255, 255, 255, .06) 40%) 0 0 / 280% 100%;
+  animation: nx-shimmer 1.5s linear infinite;
+}
+@keyframes nx-shimmer { from { background-position: 140% 0; } to { background-position: -140% 0; } }
+
+/* ---------- History: dock button, panel, toast ---------- */
+
+.nx-ui button,
+.nx-ui input { margin: 0; font-family: inherit; }
+.nx-ui [hidden] { display: none !important; }
+
+.nx-dock-btn {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  padding: 12px 18px;
+  overflow: hidden;
+  color: #fff;
+  font-size: .95rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, .28);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .14);
+  -webkit-backdrop-filter: blur(16px) saturate(1.6);
+  backdrop-filter: blur(16px) saturate(1.6);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 10px 30px rgba(10, 0, 40, .4);
+  translate: var(--tx, 0px) var(--ty, 0px);
+  transition: transform .5s var(--nx-spring), box-shadow .3s, background .3s, translate .18s ease-out;
+}
+.nx-dock-btn:hover { background: rgba(255, 255, 255, .22); transform: translateY(-3px) scale(1.04); }
+.nx-dock-btn:active { transform: scale(.95); transition-duration: .08s; }
+
+.nx-badge {
+  display: grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  box-sizing: border-box;
+  font-size: .75rem;
+  color: #4b1fa8;
+  border-radius: 999px;
+  background: #fff;
+  transition: transform .3s var(--nx-spring);
+}
+.nx-badge.pop { transform: scale(1.4); }
+
+.nx-panel {
+  position: fixed;
+  left: 16px;
+  bottom: 76px;
+  z-index: 1500;
+  display: flex;
+  flex-direction: column;
+  width: min(400px, calc(100vw - 32px));
+  max-height: min(72vh, 580px);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, .22);
+  border-radius: 28px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, .05)), rgba(24, 12, 48, .6);
+  -webkit-backdrop-filter: blur(30px) saturate(1.7);
+  backdrop-filter: blur(30px) saturate(1.7);
+  box-shadow: 0 30px 80px rgba(8, 0, 30, .6), inset 0 1px 0 rgba(255, 255, 255, .3);
+  transform-origin: bottom left;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(14px) scale(.9);
+  transition: transform .5s var(--nx-spring), opacity .25s, visibility 0s .5s;
+}
+.nx-panel.open { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+.nx-panel:focus { outline: none; }
+
+.nx-panel-head { display: flex; align-items: center; gap: 10px; padding: 16px 16px 8px 20px; }
+.nx-panel-head h2 { flex: 1; margin: 0; font-size: 1.05rem; font-weight: 700; }
+.nx-panel-head small { opacity: .7; font-size: .78rem; }
+
+.nx-x {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: #fff;
+  cursor: pointer;
+  border: 1px solid var(--nx-line);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .12);
+  transition: transform .4s var(--nx-spring), background .2s;
+}
+.nx-x:hover { background: rgba(255, 255, 255, .24); transform: rotate(90deg) scale(1.1); }
+
+.nx-search { padding: 4px 16px 10px; }
+.nx-search input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  font-size: .95rem;
+  color: #fff;
+  border: 1px solid var(--nx-line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .08);
+  outline: none;
+}
+.nx-search input:focus { border-color: rgba(200, 150, 255, .85); box-shadow: 0 0 0 4px rgba(179, 122, 239, .22); }
+
+.nx-hist-list { display: grid; gap: 10px; padding: 4px 12px 12px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+.nx-empty { padding: 28px 12px; text-align: center; font-size: .9rem; line-height: 1.5; opacity: .75; }
+
+.nx-hist-item {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  border: 1px solid var(--nx-line);
+  border-radius: 20px;
+  background: var(--nx-glass);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25);
+  transition: transform .4s var(--nx-spring), background .25s;
+}
+.nx-hist-item:hover { transform: translateY(-2px); background: rgba(255, 255, 255, .16); }
+.nx-panel.is-opening .nx-hist-item { animation: nx-rise .5s var(--nx-glide) backwards; animation-delay: calc(var(--i, 0) * 45ms + .1s); }
+.nx-hist-item.removing { pointer-events: none; animation: nx-out .24s ease forwards; }
+@keyframes nx-out { to { transform: scale(.85); opacity: 0; } }
+
+.nx-hist-open {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+  border: 0;
+  background: none;
+}
+.nx-avatar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  font-weight: 700;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 22%, rgba(255, 255, 255, .6), rgba(255, 255, 255, .08) 40%, rgba(179, 122, 239, .5));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .3), 0 6px 14px rgba(120, 60, 220, .35);
+}
+.nx-hist-main { min-width: 0; display: grid; gap: 3px; }
+.nx-hist-main b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .98rem; }
+.nx-hist-main small { opacity: .7; font-size: .76rem; }
+.nx-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+.nx-chip { display: inline-flex; gap: 4px; align-items: baseline; padding: 3px 8px; font-size: .7rem; border-radius: 999px; background: rgba(255, 255, 255, .1); }
+.nx-chip b { font-size: .82rem; }
+
+.nx-hist-del {
+  position: relative;
+  z-index: 1;
+  width: 44px;
+  padding: 0;
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, .6);
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+  transition: color .2s, background .2s;
+}
+.nx-hist-del:hover { color: #fff; background: rgba(255, 90, 120, .35); }
+
+.nx-panel-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 8px 16px 16px; font-size: .74rem; opacity: .9; }
+.nx-panel-foot span { flex: 1 1 120px; min-width: 0; opacity: .65; line-height: 1.35; }
+
+/* Hold to Confirm (linear fill variant) */
+.nx-hold {
+  position: relative;
+  overflow: hidden;
+  flex: none;
+  width: auto; /* the page's global `button { width: 100% }` made it overflow */
+  max-width: 100%;
+  white-space: nowrap;
+  padding: 9px 14px;
+  font-size: .8rem;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  user-select: none;
+  touch-action: none;
+  border: 1px solid rgba(255, 120, 140, .5);
+  border-radius: 999px;
+  background: rgba(255, 90, 120, .14);
+}
+.nx-hold::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 90, 120, .55);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .25s ease-out;
+}
+.nx-hold.holding::before { transform: scaleX(1); transition: transform .8s linear; }
+.nx-hold span { position: relative; }
+
+/* Toast Overshoot + Undo Snackbar */
+.nx-toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(92vw, 420px);
+  padding: 12px 18px;
+  font-size: .9rem;
+  color: #fff;
+  border: 1px solid var(--nx-line);
+  border-radius: 999px;
+  background: rgba(30, 16, 60, .74);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  backdrop-filter: blur(20px) saturate(1.6);
+  box-shadow: 0 18px 44px rgba(8, 0, 30, .55), inset 0 1px 0 rgba(255, 255, 255, .2);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 140%) scale(.9);
+  transition: transform .55s var(--nx-over), opacity .3s;
+}
+.nx-toast.show { opacity: 1; pointer-events: auto; transform: translate(-50%, 0) scale(1); }
+.nx-toast-btn { width: auto; flex: none; padding: 6px 12px; font-size: .82rem; font-weight: 700; color: #fff; cursor: pointer; border: 1px solid rgba(255, 255, 255, .3); border-radius: 999px; background: rgba(179, 122, 239, .5); }
+.nx-toast-btn:hover { background: rgba(179, 122, 239, .8); }
+
+/* ---------- Small screens (original 4-column result grid is kept) ---------- */
+
+@media (max-width: 768px) {
+  html body .result { gap: 8px; }
+  html body .result-item { padding: 10px 4px; border-radius: 16px; }
+  html body .result-item:hover { transform: none; }
+}
+
+@media (max-width: 600px) {
+  html body .result-item strong { font-size: .64rem; }
+  .nx-val { font-size: 1.05rem; }
+  html body .container { border-radius: 26px; }
+  .nx-dock-btn span.nx-label { display: none; }
+  .nx-dock-btn { padding: 12px 14px; }
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition-duration: .01ms !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+    </style>
 </head>
 <body>
     <div class="container">
@@ -669,7 +1539,8 @@
 
     <script>
         let numerologyResults = null; // Biến toàn cục để lưu kết quả
-        const GEMINI_API_KEY = "AIzaSyA7lwVBOUHneuq7iw_iMGalUPbJ5VMhzNA";
+        // API Key của Cohere (thay thế bằng API Key của bạn)
+        const COHERE_API_KEY = "9MHD0XvvmkJQGfQpogAmNw6ozsZalaZa57OVFMPE"; // Thay YOUR_COHERE_API_KEY bằng API Key thực tế
 
         // Hiển thị/ẩn khung chat
         function toggleChat() {
@@ -713,13 +1584,13 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // Gọi API Gemini để nhận phản hồi
-        // Gọi API Gemini để nhận phản hồi
+        // Gọi API Cohere để nhận phản hồi
         async function getCohereResponse(message) {
             if (!numerologyResults) {
                 return "Vui lòng tính toán các chỉ số trước khi hỏi.";
             }
-        
+
+            // Cập nhật context để yêu cầu trả lời giống tài liệu, sử dụng khái niệm Cây Cuộc Đời và năng lượng số
             const context = `Bạn là một chuyên gia Thần Số Học. Hãy trả lời câu hỏi sau bằng tiếng Việt, ngắn gọn (150-200 từ), dễ hiểu, sâu sắc, theo phong cách giáo dục và tích hợp khái niệm "Cây Cuộc Đời" (Rễ: tố chất bẩm sinh, Thân: bài học Đường Đời, Tán: Sứ Mệnh). Câu trả lời cần đề cập đến cách áp dụng năng lượng số trong đời sống, nghiệp và phước liên quan, đồng thời đưa ra lời khuyên thực hành (ví dụ: thiền, phóng sinh, biết ơn). Các chỉ số Numerology của người hỏi là:
             - Đường Đời: ${numerologyResults.birthValue}
             - Sứ Mệnh: ${numerologyResults.finalSum}
@@ -735,49 +1606,29 @@
             - Chặng: ${numerologyResults.chang1}, ${numerologyResults.chang2}, ${numerologyResults.chang3}, ${numerologyResults.chang4}
             - Thách Thức: ${numerologyResults.challenge1}, ${numerologyResults.challenge2}, ${numerologyResults.challenge3}, ${numerologyResults.challenge4}
             Câu hỏi: ${message}`;
-        
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-            
+
+            const url = "https://api.cohere.com/v1/chat";
             const data = {
-                contents: [{
-                    parts: [{
-                        text: context
-                    }]
-                }],
-                generationConfig: {
-                    temperature: 0.7,
-                    maxOutputTokens: 500,
-                }
+                model: "command-r-plus",
+                message: context,
+                temperature: 0.7,
+                max_tokens: 500,
             };
-        
+
             try {
                 const response = await fetch(url, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
+                        "Authorization": `Bearer ${COHERE_API_KEY}`,
                     },
                     body: JSON.stringify(data),
                 });
-        
+
                 const result = await response.json();
-                
-                // Kiểm tra lỗi từ API
-                if (result.error) {
-                    console.error("Gemini API Error:", result.error);
-                    return `Lỗi API: ${result.error.message || 'Không xác định'}`;
-                }
-                
-                // Kiểm tra cấu trúc response
-                if (result.candidates && result.candidates[0] && 
-                    result.candidates[0].content && result.candidates[0].content.parts && 
-                    result.candidates[0].content.parts[0]) {
-                    return result.candidates[0].content.parts[0].text;
-                } else {
-                    console.error("Unexpected response structure:", result);
-                    return "Xin lỗi, không thể nhận được phản hồi từ AI.";
-                }
+                return result.text;
             } catch (error) {
-                console.error("Lỗi khi gọi API Gemini:", error);
+                console.error("Lỗi khi gọi API Cohere:", error);
                 return "Xin lỗi, tôi không thể kết nối đến AI ngay lúc này.";
             }
         }
@@ -1399,49 +2250,30 @@
         // Lấy mô tả cho từng số
         async function getNumberDescription(number, aspect) {
             if (!numerologyResults) return "Vui lòng tính toán các chỉ số trước.";
-        
+
+            // Tùy chỉnh mô tả dựa trên khái niệm Cây Cuộc Đời và năng lượng số
             const context = `Bạn là một chuyên gia Thần Số Học. Hãy mô tả ý nghĩa của ${aspect} số ${number} trong Thần Số Học bằng tiếng Việt, ngắn gọn (150-200 từ), sâu sắc, và giáo dục. Tích hợp khái niệm "Cây Cuộc Đời" (Rễ: tố chất bẩm sinh, Thân: bài học Đường Đời, Tán: Sứ Mệnh) để giải thích ý nghĩa. Đề cập đến năng lượng chuẩn, ngược, quá mức của số này, nghiệp/phước liên quan, và cách áp dụng thực tiễn (ví dụ: chọn ngày số phù hợp, thiền, phóng sinh, biết ơn). Nếu là số chủ (11, 22, 33), nhấn mạnh ý nghĩa đặc biệt.`;
-        
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GEMINI_API_KEY}`;
-            
+
+            const url = "https://api.cohere.com/v1/chat";
             const data = {
-                contents: [{
-                    parts: [{
-                        text: context
-                    }]
-                }],
-                generationConfig: {
-                    temperature: 0.7,
-                    maxOutputTokens: 300,
-                }
+                model: "command-r-plus",
+                message: context,
+                temperature: 0.7,
+                max_tokens: 300,
             };
-        
+
             try {
                 const response = await fetch(url, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
+                        "Authorization": `Bearer ${COHERE_API_KEY}`,
                     },
                     body: JSON.stringify(data),
                 });
-        
+
                 const result = await response.json();
-                
-                // Kiểm tra lỗi từ API
-                if (result.error) {
-                    console.error("Gemini API Error:", result.error);
-                    return "Không thể lấy mô tả vào lúc này.";
-                }
-                
-                // Kiểm tra cấu trúc response
-                if (result.candidates && result.candidates[0] && 
-                    result.candidates[0].content && result.candidates[0].content.parts && 
-                    result.candidates[0].content.parts[0]) {
-                    return result.candidates[0].content.parts[0].text;
-                } else {
-                    console.error("Unexpected response structure:", result);
-                    return "Không thể lấy mô tả vào lúc này.";
-                }
+                return result.text;
             } catch (error) {
                 console.error("Lỗi khi lấy mô tả:", error);
                 return "Không thể lấy mô tả vào lúc này.";
@@ -1930,6 +2762,740 @@
 
             container.innerHTML = steps.join('');
         }
+    </script>
+    <script>
+/*!
+ * Numerus — UI + local-history layer
+ * ---------------------------------------------------------------------------
+ * Loaded with `defer` after the original inline script. It does NOT edit the
+ * original calculation code: it wraps a few global functions (calculateNumerology,
+ * openTab, showDetailedView, displayMessage, getCohereResponse, getNumberDescription)
+ * and adds DOM on top.
+ *
+ * localStorage keys
+ *   numerus.history.v1  list of past lookups (name, birth date, results)
+ *   numerus.chat.v1     chat log
+ *   numerus.desc.v1     cache of AI descriptions (saves API calls, works offline)
+ */
+(() => {
+  'use strict';
+
+  const KEY = { hist: 'numerus.history.v1', chat: 'numerus.chat.v1', desc: 'numerus.desc.v1' };
+  const MAX_HIST = 60;
+  const MAX_CHAT = 80;
+  const mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const mqFine = window.matchMedia('(hover: hover) and (pointer: fine)');
+  const root = document.documentElement;
+
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+
+  function h(tag, props, ...kids) {
+    const el = document.createElement(tag);
+    for (const [k, v] of Object.entries(props || {})) {
+      if (v == null || v === false) continue;
+      if (k === 'class') el.className = v;
+      else if (k === 'text') el.textContent = v;
+      else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+      else el.setAttribute(k, v === true ? '' : v);
+    }
+    el.append(...kids.flat().filter(k => k != null && k !== false));
+    return el;
+  }
+
+  const store = {
+    get(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch (_) { return fallback; }
+    },
+    set(key, value) {
+      try { localStorage.setItem(key, JSON.stringify(value)); return true; }
+      catch (_) { return false; }
+    },
+  };
+
+  /** Replace a global function with a wrapper; no-op if it does not exist. */
+  function wrap(name, make) {
+    const orig = window[name];
+    if (typeof orig === 'function') window[name] = make(orig);
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Background: dark nebula + glowing star field (canvas)
+   * ------------------------------------------------------------------ */
+  const ORBS = [
+    { h: 262, s: 70, x: '-15%', y: '-20%', t: 45, dl: 0 },
+    { h: 232, s: 60, x: '60%', y: '40%', t: 55, dl: -15 },
+    { h: 280, s: 45, x: '20%', y: '65%', t: 65, dl: -25 },
+  ];
+
+  function buildBackground() {
+    const bg = h('div', { class: 'nx-bg', 'aria-hidden': 'true' });
+    ORBS.forEach(o => {
+      const el = h('span', { class: 'nx-orb' });
+      el.style.cssText = `--h:${o.h};--s:${o.s}vmax;left:${o.x};top:${o.y};animation-duration:${o.t}s;animation-delay:${o.dl}s`;
+      bg.append(el);
+    });
+    const canvas = h('canvas', { class: 'nx-stars' });
+    bg.append(canvas);
+    document.body.prepend(bg);
+    startStarfield(canvas);
+  }
+
+  /** Glowing star field: twinkle, slow drift, pointer parallax, rare shooting star. */
+  function startStarfield(canvas) {
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const PALETTE = [[255, 255, 255], [195, 215, 255], [255, 238, 215], [200, 175, 255]];
+    const sprites = PALETTE.map(([r, g, b]) => {
+      const c = document.createElement('canvas');
+      c.width = c.height = 64;
+      const x = c.getContext('2d');
+      const grad = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+      grad.addColorStop(0, `rgba(${r},${g},${b},1)`);
+      grad.addColorStop(0.18, `rgba(${r},${g},${b},.55)`);
+      grad.addColorStop(0.5, `rgba(${r},${g},${b},.12)`);
+      grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
+      x.fillStyle = grad;
+      x.fillRect(0, 0, 64, 64);
+      return c;
+    });
+
+    let w = 0, ht = 0, stars = [], shoot = null, nextShoot = 0, last = 0, raf = 0, resizeTimer = 0;
+    const ptr = { x: 0, y: 0, tx: 0, ty: 0 };
+
+    function resize() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = window.innerWidth;
+      ht = window.innerHeight;
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(ht * dpr);
+      ctx.setTransform(dpr, 0, 0, ht ? dpr : 1, 0, 0);
+      const n = Math.min(280, Math.round((w * ht) / 5500));
+      stars = Array.from({ length: n }, () => {
+        const big = Math.random() < 0.12;
+        return {
+          x: Math.random() * w,
+          y: Math.random() * ht,
+          z: 0.2 + Math.random() * 0.8,
+          r: big ? 2 + Math.random() * 2 : 0.5 + Math.random() * 1.1,
+          c: sprites[Math.random() < 0.6 ? 0 : Math.floor(Math.random() * sprites.length)],
+          ph: Math.random() * 6.28,
+          sp: 0.0004 + Math.random() * 0.0014,
+        };
+      });
+    }
+
+    function draw(t, dt, animate) {
+      ctx.clearRect(0, 0, w, ht);
+      ptr.x += (ptr.tx - ptr.x) * 0.05;
+      ptr.y += (ptr.ty - ptr.y) * 0.05;
+      for (const s of stars) {
+        if (animate) {
+          s.x += 0.006 * s.z * dt;
+          s.y -= 0.003 * s.z * dt;
+          if (s.x > w + 10) s.x = -10;
+          if (s.y < -10) s.y = ht + 10;
+        }
+        const tw = 0.5 + 0.5 * Math.sin(t * s.sp + s.ph);
+        const d = s.r * (s.r > 1.8 ? 7 : 6);
+        const px = s.x + ptr.x * 14 * s.z;
+        const py = s.y + ptr.y * 14 * s.z;
+        ctx.globalAlpha = (0.35 + 0.65 * tw) * (0.35 + 0.65 * s.z);
+        ctx.drawImage(s.c, px - d / 2, py - d / 2, d, d);
+      }
+      ctx.globalAlpha = 1;
+      if (animate) drawShoot(t, dt);
+    }
+
+    function drawShoot(t, dt) {
+      if (!shoot && t > nextShoot) {
+        shoot = { x: w * (0.3 + Math.random() * 0.7), y: ht * Math.random() * 0.4, life: 0 };
+        nextShoot = t + 7000 + Math.random() * 8000;
+      }
+      if (!shoot) return;
+      shoot.life += dt;
+      const p = shoot.life / 900;
+      if (p >= 1) { shoot = null; return; }
+      const hx = shoot.x - 0.9 * shoot.life;
+      const hy = shoot.y + 0.45 * shoot.life;
+      const g = ctx.createLinearGradient(hx, hy, hx + 90, hy - 45);
+      g.addColorStop(0, 'rgba(255,255,255,.9)');
+      g.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.globalAlpha = 1 - p;
+      ctx.strokeStyle = g;
+      ctx.lineWidth = 1.3;
+      ctx.beginPath();
+      ctx.moveTo(hx, hy);
+      ctx.lineTo(hx + 90, hy - 45);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
+    function frame(t) {
+      const dt = Math.min(t - last, 50);
+      last = t;
+      draw(t, dt, true);
+      raf = requestAnimationFrame(frame);
+    }
+
+    function start() {
+      cancelAnimationFrame(raf);
+      resize();
+      if (mqReduce.matches) { draw(0, 0, false); return; }
+      nextShoot = performance.now() + 4000;
+      last = performance.now();
+      raf = requestAnimationFrame(frame);
+    }
+
+    window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(start, 150); });
+    window.addEventListener('pointermove', e => {
+      ptr.tx = (e.clientX / (w || 1)) * 2 - 1;
+      ptr.ty = (e.clientY / (ht || 1)) * 2 - 1;
+    }, { passive: true });
+    start();
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Static decoration of existing markup (classes / a11y only)
+   * ------------------------------------------------------------------ */
+  function decorateStatic() {
+    $$('.container > button').forEach(b => b.classList.add('nx-cta', 'nx-ripple'));
+    $$('.tab-button, .close-modal, #close-chat, #send-button, #chat-button').forEach(el => el.classList.add('nx-ripple'));
+
+    // ripples are absolutely positioned inside the element
+    $$('.nx-ripple').forEach(el => {
+      if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
+    });
+
+    $$('.container > :is(h1, input#name, h2, h3, .current-date-container, .nx-cta)').forEach((el, i) => {
+      el.classList.add('nx-enter');
+      el.style.setProperty('--i', i);
+    });
+
+    $$('input[placeholder]').forEach(i => i.setAttribute('aria-label', i.placeholder));
+    const selectLabels = { currentYear: 'Năm hiện tại', currentMonth: 'Tháng hiện tại', currentDay: 'Ngày hiện tại' };
+    Object.entries(selectLabels).forEach(([id, label]) => { const el = document.getElementById(id); if (el) el.setAttribute('aria-label', label); });
+
+    const chatBtn = $('#chat-button');
+    if (chatBtn) {
+      chatBtn.setAttribute('role', 'button');
+      chatBtn.setAttribute('tabindex', '0');
+      chatBtn.setAttribute('data-nx-magnet', '');
+      chatBtn.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.toggleChat && window.toggleChat(); }
+      });
+    }
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Result grid: reveal on scroll (IntersectionObserver), count-up
+   * ------------------------------------------------------------------ */
+  function countUp(span, delay) {
+    const node = span.firstChild;
+    const target = parseInt(span.textContent, 10);
+    if (!node || !Number.isFinite(target) || target < 1 || mqReduce.matches) return;
+    const dur = 700;
+    let start = null;
+    node.nodeValue = '0';
+    const step = t => {
+      if (start === null) start = t + delay;
+      const p = Math.min(Math.max((t - start) / dur, 0), 1);
+      node.nodeValue = String(Math.round(target * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  function reveal(el) {
+    el.classList.add('nx-in');
+    const val = $('.nx-val', el);
+    if (val && /^\d+$/.test(val.textContent.trim())) {
+      countUp(val, (parseInt(el.style.getPropertyValue('--i'), 10) || 0) * 35);
+    }
+  }
+
+  const io = 'IntersectionObserver' in window
+    ? new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) { reveal(e.target); io.unobserve(e.target); } });
+      }, { threshold: 0.2 })
+    : null;
+
+  function decorateResults() {
+    $$('#result .result-item').forEach((el, i) => {
+      if (el.dataset.nx) return;
+      el.dataset.nx = '1';
+      el.style.setProperty('--i', i);
+      const label = $('strong', el);
+      if (label) label.textContent = label.textContent.replace(/:\s*$/, '');
+      const textNode = Array.from(el.childNodes).find(n => n.nodeType === 3 && n.textContent.trim());
+      if (textNode) {
+        const span = h('span', { class: 'nx-val', text: textNode.textContent.trim() });
+        el.replaceChild(span, textNode);
+      }
+      io ? io.observe(el) : reveal(el);
+    });
+  }
+
+  function setupResults() {
+    const result = $('#result');
+    if (!result) return;
+    new MutationObserver(decorateResults).observe(result, { childList: true });
+    decorateResults();
+
+    // keep tooltips inside the viewport (flip below / shift sideways)
+    result.addEventListener('pointerover', e => {
+      const item = e.target.closest('.result-item');
+      const tip = item && $('.tooltip-text', item);
+      if (!tip) return;
+      tip.style.left = '';
+      tip.classList.remove('nx-below');
+      const r = item.getBoundingClientRect();
+      const w = tip.offsetWidth;
+      const hh = tip.offsetHeight;
+      const left = r.left + r.width / 2 - w / 2;
+      let shift = 0;
+      if (left < 8) shift = 8 - left;
+      else if (left + w > window.innerWidth - 8) shift = window.innerWidth - 8 - (left + w);
+      if (shift) tip.style.left = `calc(50% + ${Math.round(shift)}px)`;
+      if (r.top - hh - r.height * 0.2 < 8) tip.classList.add('nx-below');
+    });
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Pointer layer: spotlight, magnetic pills, ripple
+   * ------------------------------------------------------------------ */
+  let pendingMove = null;
+  let moveRaf = 0;
+
+  function flushMove() {
+    moveRaf = 0;
+    const e = pendingMove;
+    if (!e) return;
+
+    if (mqFine.matches && !mqReduce.matches) {
+      $$('[data-nx-magnet]').forEach(el => {
+        const r = el.getBoundingClientRect();
+        const dx = e.clientX - (r.left + r.width / 2);
+        const dy = e.clientY - (r.top + r.height / 2);
+        const near = Math.abs(dx) < r.width / 2 + 50 && Math.abs(dy) < r.height / 2 + 50;
+        el.style.setProperty('--tx', near ? `${Math.max(-10, Math.min(10, dx * 0.3)).toFixed(1)}px` : '0px');
+        el.style.setProperty('--ty', near ? `${Math.max(-8, Math.min(8, dy * 0.3)).toFixed(1)}px` : '0px');
+      });
+    }
+
+    const card = e.target.closest && e.target.closest('.result-item, .number-card, .nx-hist-item');
+    if (card) {
+      const r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', `${e.clientX - r.left}px`);
+      card.style.setProperty('--my', `${e.clientY - r.top}px`);
+    }
+  }
+
+  function setupPointer() {
+    document.addEventListener('pointermove', e => {
+      pendingMove = e;
+      if (!moveRaf) moveRaf = requestAnimationFrame(flushMove);
+    }, { passive: true });
+
+    document.addEventListener('pointerdown', e => {
+      if (mqReduce.matches) return;
+      const el = e.target.closest('.nx-ripple');
+      if (!el || el.disabled) return;
+      const r = el.getBoundingClientRect();
+      const size = Math.max(r.width, r.height) * 1.2;
+      const rip = h('span', { class: 'nx-rip', 'aria-hidden': 'true' });
+      rip.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - r.left - size / 2}px;top:${e.clientY - r.top - size / 2}px`;
+      el.append(rip);
+      rip.addEventListener('animationend', () => rip.remove(), { once: true });
+    });
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Details modal: gliding tab pill, Esc / backdrop to close
+   * ------------------------------------------------------------------ */
+  function setupModal() {
+    const bar = $('.detailed-tabs');
+    const modal = $('#detailed-modal');
+    if (bar) {
+      const pill = h('span', { class: 'nx-pill', 'aria-hidden': 'true' });
+      bar.prepend(pill);
+      const move = instant => {
+        const active = $('.tab-button.active', bar);
+        if (!active || !active.offsetWidth) return;
+        if (instant) pill.style.transition = 'none';
+        pill.style.width = `${active.offsetWidth}px`;
+        pill.style.translate = `${active.offsetLeft}px 0`;
+        if (instant) { void pill.offsetWidth; pill.style.transition = ''; }
+        const left = Math.max(0, active.offsetLeft - (bar.clientWidth - active.offsetWidth) / 2);
+        bar.scrollTo({ left, behavior: instant || mqReduce.matches ? 'auto' : 'smooth' });
+      };
+      wrap('openTab', orig => function () { const r = orig.apply(this, arguments); move(false); return r; });
+      wrap('showDetailedView', orig => function () {
+        const r = orig.apply(this, arguments);
+        requestAnimationFrame(() => move(true));
+        return r;
+      });
+      window.addEventListener('resize', () => move(true));
+    }
+
+    if (modal) {
+      let downOnBackdrop = false;
+      modal.addEventListener('pointerdown', e => { downOnBackdrop = e.target === modal; });
+      modal.addEventListener('click', e => {
+        if (e.target === modal && downOnBackdrop && window.closeDetailedView) window.closeDetailedView();
+        downOnBackdrop = false;
+      });
+    }
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Toast (Toast Overshoot + Undo Snackbar)
+   * ------------------------------------------------------------------ */
+  const toastEl = h('div', { class: 'nx-ui nx-toast', role: 'status', 'aria-live': 'polite' });
+  toastEl.inert = true;
+  let toastTimer = 0;
+
+  function hideToast() {
+    toastEl.classList.remove('show');
+    toastEl.inert = true;
+  }
+
+  function toast(message, action) {
+    clearTimeout(toastTimer);
+    toastEl.replaceChildren(
+      h('span', { text: message }),
+      action && h('button', {
+        type: 'button',
+        class: 'nx-toast-btn',
+        text: action.label,
+        onclick: () => { action.run(); hideToast(); },
+      }),
+    );
+    toastEl.inert = false;
+    toastEl.classList.add('show');
+    toastTimer = setTimeout(hideToast, action ? 5000 : 2600);
+  }
+
+  /* ------------------------------------------------------------------ *
+   * History (localStorage)
+   * ------------------------------------------------------------------ */
+  let restoring = false;
+  let panelOpen = false;
+  let query = '';
+
+  const norm = s => String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').toLowerCase().trim();
+  const pad = n => String(n).padStart(2, '0');
+  const fmtDate = d => `${pad(d.d)}/${pad(d.m)}/${d.y}`;
+  const loadHist = () => { const v = store.get(KEY.hist, []); return Array.isArray(v) ? v : []; };
+  const saveHist = list => store.set(KEY.hist, list.slice(0, MAX_HIST));
+
+  function ago(ts) {
+    const s = (Date.now() - ts) / 1000;
+    if (s < 60) return 'vừa xong';
+    const rtf = new Intl.RelativeTimeFormat('vi', { numeric: 'auto' });
+    if (s < 3600) return rtf.format(-Math.round(s / 60), 'minute');
+    if (s < 86400) return rtf.format(-Math.round(s / 3600), 'hour');
+    if (s < 86400 * 30) return rtf.format(-Math.round(s / 86400), 'day');
+    return new Date(ts).toLocaleDateString('vi-VN');
+  }
+
+  const ICON_CLOCK = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+
+  const badge = h('b', { class: 'nx-badge', hidden: true, 'aria-hidden': 'true' });
+  const histBtn = h('button', {
+    id: 'nx-hist-btn',
+    type: 'button',
+    class: 'nx-ui nx-dock-btn nx-ripple',
+    'data-nx-magnet': '',
+    'aria-haspopup': 'dialog',
+    'aria-expanded': 'false',
+    'aria-controls': 'nx-hist-panel',
+    'aria-label': 'Lịch sử tra cứu',
+  }, h('span', { class: 'nx-label', text: 'Lịch sử' }), badge);
+  histBtn.insertAdjacentHTML('afterbegin', ICON_CLOCK);
+
+  const countEl = h('small');
+  const searchInput = h('input', { type: 'search', placeholder: 'Tìm theo tên hoặc ngày sinh…', 'aria-label': 'Tìm trong lịch sử', autocomplete: 'off' });
+  const listEl = h('div', { class: 'nx-hist-list' });
+  const holdBtn = h('button', { type: 'button', class: 'nx-hold', 'aria-label': 'Giữ để xóa toàn bộ lịch sử' }, h('span', { text: 'Giữ để xóa tất cả' }));
+  const panel = h('section', {
+    id: 'nx-hist-panel',
+    class: 'nx-ui nx-panel',
+    role: 'dialog',
+    'aria-label': 'Lịch sử tra cứu',
+    tabindex: '-1',
+  },
+  h('div', { class: 'nx-panel-head' },
+    h('h2', { text: 'Lịch sử tra cứu' }), countEl,
+    h('button', { type: 'button', class: 'nx-x nx-ripple', 'aria-label': 'Đóng', text: '×', onclick: () => closePanel() })),
+  h('div', { class: 'nx-search' }, searchInput),
+  listEl,
+  h('div', { class: 'nx-panel-foot' }, h('span', { text: 'Chỉ lưu trên thiết bị này (localStorage).' }), holdBtn));
+  panel.inert = true;
+
+  function bumpBadge() {
+    badge.classList.remove('pop');
+    void badge.offsetWidth;
+    badge.classList.add('pop');
+    setTimeout(() => badge.classList.remove('pop'), 320);
+  }
+
+  function itemNode(entry, i) {
+    const r = entry.r || {};
+    const soul = typeof window.reduceNumber === 'function' ? window.reduceNumber(r.soulValue) : r.soulValue;
+    const chips = [['Đường đời', r.birthValue], ['Sứ mệnh', r.finalSum], ['Linh hồn', soul], ['Nhân cách', r.personalityValue]]
+      .filter(([, v]) => v !== undefined && v !== null && !Number.isNaN(v))
+      .map(([label, v]) => h('span', { class: 'nx-chip' }, label, h('b', { text: String(v) })));
+
+    const node = h('article', { class: 'nx-hist-item' });
+    node.style.setProperty('--i', Math.min(i, 8));
+    node.append(
+      h('button', {
+        type: 'button',
+        class: 'nx-hist-open nx-ripple',
+        'aria-label': `Xem lại kết quả của ${entry.name}`,
+        onclick: () => restore(entry.id),
+      },
+      h('span', { class: 'nx-avatar', 'aria-hidden': 'true', text: (entry.name[0] || '?').toUpperCase() }),
+      h('span', { class: 'nx-hist-main' },
+        h('b', { text: entry.name }),
+        h('small', { text: `${fmtDate(entry.bd)} · ${ago(entry.ts)}` }),
+        h('span', { class: 'nx-chips' }, chips))),
+      h('button', {
+        type: 'button',
+        class: 'nx-hist-del',
+        'aria-label': `Xóa ${entry.name} khỏi lịch sử`,
+        text: '×',
+        onclick: () => removeEntry(entry.id, node),
+      }),
+    );
+    return node;
+  }
+
+  function renderHist() {
+    const all = loadHist();
+    badge.textContent = String(all.length);
+    badge.hidden = all.length === 0;
+    countEl.textContent = all.length ? `${all.length} lượt` : '';
+    holdBtn.hidden = all.length === 0;
+
+    const q = norm(query);
+    const shown = q ? all.filter(e => norm(e.name).includes(q) || fmtDate(e.bd).includes(q)) : all;
+    if (!shown.length) {
+      listEl.replaceChildren(h('p', {
+        class: 'nx-empty',
+        text: all.length
+          ? 'Không tìm thấy kết quả phù hợp.'
+          : 'Chưa có lượt tra nào. Nhập họ tên, ngày sinh rồi bấm "Tính toán" — kết quả sẽ tự lưu ở đây.',
+      }));
+      return;
+    }
+    listEl.replaceChildren(...shown.map(itemNode));
+  }
+
+  function recordLookup() {
+    if (typeof numerologyResults === 'undefined' || !numerologyResults) return;
+    const name = ($('#name').value || '').trim().replace(/\s+/g, ' ');
+    const bd = { d: parseInt($('#birthDay').value, 10), m: parseInt($('#birthMonth').value, 10), y: parseInt($('#birthYear').value, 10) };
+    const cur = { d: parseInt($('#currentDay').value, 10), m: parseInt($('#currentMonth').value, 10), y: parseInt($('#currentYear').value, 10) };
+    const within = (n, a, b) => Number.isInteger(n) && n >= a && n <= b;
+    if (!name || !within(bd.d, 1, 31) || !within(bd.m, 1, 12) || !within(bd.y, 1900, 2200)) return;
+    if (!Number.isFinite(numerologyResults.birthValue) || !Number.isFinite(numerologyResults.finalSum)) return;
+
+    const id = `${norm(name)}|${bd.d}-${bd.m}-${bd.y}`;
+    const before = loadHist();
+    const existed = before.some(x => x.id === id);
+    const entry = { id, ts: Date.now(), name, bd, cur, r: JSON.parse(JSON.stringify(numerologyResults)) };
+    const ok = saveHist([entry, ...before.filter(x => x.id !== id)]);
+    renderHist();
+    if (ok) { bumpBadge(); toast(existed ? 'Đã cập nhật lịch sử' : 'Đã lưu vào lịch sử'); }
+    else toast('Không lưu được lịch sử (trình duyệt đang chặn hoặc hết dung lượng)');
+  }
+
+  function restore(id) {
+    const entry = loadHist().find(x => x.id === id);
+    if (!entry) return;
+    const setVal = (sel, v) => { const el = $(sel); if (el) el.value = v; };
+    restoring = true;
+    try {
+      setVal('#name', entry.name);
+      setVal('#birthDay', entry.bd.d);
+      setVal('#birthMonth', entry.bd.m);
+      setVal('#birthYear', entry.bd.y);
+      setVal('#currentYear', entry.cur.y);
+      setVal('#currentMonth', entry.cur.m);
+      setVal('#currentDay', entry.cur.d);
+      window.calculateNumerology();
+    } finally { restoring = false; }
+    closePanel(false);
+    const result = $('#result');
+    if (result) result.scrollIntoView({ behavior: mqReduce.matches ? 'auto' : 'smooth', block: 'start' });
+    toast(`Đã mở lại kết quả của ${entry.name}`);
+  }
+
+  function removeEntry(id, node) {
+    const before = loadHist();
+    const finish = () => {
+      saveHist(before.filter(x => x.id !== id));
+      renderHist();
+      toast('Đã xóa khỏi lịch sử', { label: 'Hoàn tác', run: () => { saveHist(before); renderHist(); bumpBadge(); } });
+    };
+    if (mqReduce.matches) return finish();
+    node.classList.add('removing');
+    setTimeout(finish, 240);
+  }
+
+  function clearAll() {
+    const before = loadHist();
+    saveHist([]);
+    renderHist();
+    toast('Đã xóa toàn bộ lịch sử', { label: 'Hoàn tác', run: () => { saveHist(before); renderHist(); bumpBadge(); } });
+  }
+
+  function bindHold(btn, ms, onDone) {
+    let timer = 0;
+    const start = e => {
+      if (e.repeat) return;
+      btn.classList.add('holding');
+      timer = setTimeout(() => { btn.classList.remove('holding'); onDone(); }, ms);
+    };
+    const cancel = () => { clearTimeout(timer); btn.classList.remove('holding'); };
+    btn.addEventListener('pointerdown', start);
+    ['pointerup', 'pointerleave', 'pointercancel', 'blur'].forEach(t => btn.addEventListener(t, cancel));
+    btn.addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); start(e); } });
+    btn.addEventListener('keyup', cancel);
+    btn.addEventListener('contextmenu', e => e.preventDefault());
+  }
+
+  function openPanel() {
+    if (panelOpen) return;
+    panelOpen = true;
+    renderHist();
+    panel.inert = false;
+    panel.classList.add('open', 'is-opening');
+    histBtn.setAttribute('aria-expanded', 'true');
+    setTimeout(() => panel.classList.remove('is-opening'), 900);
+    (mqFine.matches ? searchInput : panel).focus({ preventScroll: true });
+  }
+
+  function closePanel(returnFocus = true) {
+    if (!panelOpen) return;
+    panelOpen = false;
+    panel.classList.remove('open', 'is-opening');
+    panel.inert = true;
+    histBtn.setAttribute('aria-expanded', 'false');
+    if (returnFocus) histBtn.focus({ preventScroll: true });
+  }
+
+  function setupHistory() {
+    document.body.append(histBtn, panel, toastEl);
+    histBtn.addEventListener('click', () => (panelOpen ? closePanel() : openPanel()));
+    searchInput.addEventListener('input', () => { query = searchInput.value; renderHist(); });
+    bindHold(holdBtn, 800, clearAll);
+
+    document.addEventListener('pointerdown', e => {
+      if (panelOpen && !panel.contains(e.target) && !histBtn.contains(e.target) && !toastEl.contains(e.target)) closePanel(false);
+    });
+    window.addEventListener('storage', e => { if (e.key === KEY.hist) renderHist(); });
+    window.addEventListener('keydown', e => {
+      if (e.key !== 'Escape') return;
+      const modal = $('#detailed-modal');
+      if (panelOpen) closePanel();
+      else if (modal && modal.style.display === 'flex' && window.closeDetailedView) window.closeDetailedView();
+    });
+
+    wrap('calculateNumerology', orig => function () {
+      const out = orig.apply(this, arguments);
+      if (!restoring) recordLookup();
+      return out;
+    });
+    renderHist();
+  }
+
+  /* ------------------------------------------------------------------ *
+   * AI description cache + chat log + typing indicator
+   * ------------------------------------------------------------------ */
+  const AI_FALLBACKS = new Set([
+    'Không thể lấy mô tả vào lúc này.',
+    'Vui lòng tính toán các chỉ số trước.',
+    'Vui lòng tính toán các chỉ số trước khi hỏi.',
+    'Xin lỗi, tôi không thể kết nối đến AI ngay lúc này.',
+  ]);
+
+  function setupAiLayer() {
+    wrap('getNumberDescription', orig => async function (number, aspect) {
+      const key = `${aspect}|${number}`;
+      const cache = store.get(KEY.desc, {});
+      if (typeof cache[key] === 'string' && cache[key]) return cache[key];
+      const out = await orig.apply(this, arguments);
+      if (typeof out === 'string' && out.length > 40 && !AI_FALLBACKS.has(out)) {
+        cache[key] = out;
+        store.set(KEY.desc, cache);
+      }
+      return out;
+    });
+
+    const log = (() => { const v = store.get(KEY.chat, []); return Array.isArray(v) ? v : []; })();
+    let replaying = false;
+
+    wrap('displayMessage', orig => function (message, sender) {
+      orig.apply(this, arguments);
+      const body = $('#chat-body');
+      if (body) body.scrollTop = body.scrollHeight; // original scrolled the wrong element
+      if (replaying || AI_FALLBACKS.has(String(message))) return;
+      log.push({ m: String(message), s: sender });
+      while (log.length > MAX_CHAT) log.shift();
+      store.set(KEY.chat, log);
+    });
+
+    wrap('getCohereResponse', orig => async function () {
+      const box = $('#chat-messages');
+      const typing = h('div', { class: 'message bot nx-typing', 'aria-label': 'Đang trả lời' }, h('i'), h('i'), h('i'));
+      if (box) { box.append(typing); const body = $('#chat-body'); if (body) body.scrollTop = body.scrollHeight; }
+      try { return await orig.apply(this, arguments); }
+      finally { typing.remove(); }
+    });
+
+    replaying = true;
+    log.forEach(x => window.displayMessage && window.displayMessage(x.m, x.s));
+    replaying = false;
+
+    const header = $('#chat-header');
+    const closeBtn = $('#close-chat');
+    if (header && closeBtn) {
+      header.insertBefore(h('button', {
+        type: 'button',
+        class: 'nx-chat-clear nx-ripple',
+        title: 'Xóa cuộc trò chuyện',
+        'aria-label': 'Xóa cuộc trò chuyện',
+        text: '⌫',
+        onclick: () => {
+          log.length = 0;
+          store.set(KEY.chat, log);
+          const box = $('#chat-messages');
+          if (box) box.replaceChildren();
+          toast('Đã xóa cuộc trò chuyện');
+        },
+      }), closeBtn);
+      const clr = $('.nx-chat-clear');
+      if (getComputedStyle(clr).position === 'static') clr.style.position = 'relative';
+    }
+  }
+
+  /* ------------------------------------------------------------------ */
+
+  buildBackground();
+  decorateStatic();
+  setupResults();
+  setupPointer();
+  setupModal();
+  setupHistory();
+  setupAiLayer();
+})();
+
     </script>
 </body>
 </html>
