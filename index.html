@@ -217,6 +217,7 @@
         #send-button:hover {
             background-color: #f7f7f7;
         }
+        
         /* Nút Messenger */
         #messenger-button {
             position: fixed;
@@ -238,7 +239,8 @@
         #messenger-button:hover {
             background-color: #ad65e5;
         }
-        /* Nút zalo */
+
+        /* Nút Zalo */
         #zalo-button {
             position: fixed;
             bottom: 140px;
@@ -257,6 +259,28 @@
         }
 
         #zalo-button:hover {
+            background-color: #ad65e5;
+        }
+
+        /* Nút gọi điện */
+        #phone-button {
+            position: fixed;
+            bottom: 200px;
+            right: 20px;
+            background-color: #ffffff;
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+
+        #phone-button:hover {
             background-color: #ad65e5;
         }
         /* Detailed view styles */
@@ -507,6 +531,114 @@ html body {
 @keyframes nx-drift {
   from { transform: translate3d(-4%, -3%, 0) scale(1); }
   to   { transform: translate3d(5%, 6%, 0) scale(1.12); }
+}
+
+/* ---------- Floating numerology numbers (inspired by xemthansohoc.online) ---------- */
+.nx-float-num {
+  position: absolute;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 200, 120, 0.18);
+  text-shadow: 0 0 20px rgba(255, 180, 80, 0.15);
+  pointer-events: none;
+  user-select: none;
+  will-change: transform, opacity;
+  animation: nx-float-drift linear infinite;
+  opacity: 0.25;
+}
+.nx-float-num.gold {
+  color: rgba(255, 200, 80, 0.35);
+  text-shadow: 0 0 28px rgba(255, 180, 60, 0.25);
+  opacity: 0.4;
+}
+@keyframes nx-float-drift {
+  0%   { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0.15; }
+  25%  { opacity: 0.35; }
+  50%  { transform: translateY(-40px) translateX(15px) rotate(3deg); opacity: 0.25; }
+  75%  { opacity: 0.4; }
+  100% { transform: translateY(-80px) translateX(-10px) rotate(-2deg); opacity: 0.1; }
+}
+
+/* ---------- Career Venn + Ikigai diagrams ---------- */
+.nx-venn-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  margin: 20px 0;
+}
+.nx-venn-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  background: linear-gradient(110deg, #fff, #e2c6ff 40%, #ffb86c 80%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-align: center;
+}
+.nx-venn-sub {
+  font-size: 0.9rem;
+  opacity: 0.75;
+  text-align: center;
+  margin-top: -12px;
+}
+.nx-venn-svg {
+  width: min(440px, 96vw);
+  height: auto;
+  max-width: 100%;
+  filter: drop-shadow(0 12px 30px rgba(80, 40, 160, 0.35));
+}
+.nx-venn-svg text {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  pointer-events: none;
+}
+.nx-venn-label {
+  font-size: 11px;
+  font-weight: 600;
+  fill: #fff;
+  text-anchor: middle;
+}
+.nx-venn-value {
+  font-size: 18px;
+  font-weight: 800;
+  fill: #fff;
+  text-anchor: middle;
+}
+.nx-ikigai-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 18px;
+  width: 100%;
+}
+.nx-ikigai-card {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 16px;
+  padding: 14px 16px;
+  text-align: left;
+}
+.nx-ikigai-card h4 {
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+  color: #ffb86c;
+}
+.nx-ikigai-card p {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  opacity: 0.9;
+}
+.nx-career-note {
+  margin-top: 16px;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(179,122,239,0.2), rgba(255,150,80,0.12));
+  border: 1px solid rgba(255,200,120,0.25);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  text-align: left;
 }
 
 /* ---------- Main glass card ----------
@@ -1313,12 +1445,20 @@ html body #life-journey-steps:empty {
             <datalist id="birthYearList"></datalist>
         </div>
         <!-- Nút zalo -->
-        <a id="zalo-button" href="https://zalo.me/0778305689" target="_blank">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/1200px-Icon_of_Zalo.svg.png" alt="zalo" style="width: 24px; height: 24px;">
+        <a id="zalo-button" href="https://zalo.me/0788671319" target="_blank">
+            <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/9/91/Icon_of_Zalo.svg/3840px-Icon_of_Zalo.svg.png?utm_source=vi.wikipedia.org&utm_campaign=index&utm_content=thumbnail" alt="zalo" style="width: 24px; height: 24px;">
         </a>
         <!-- Nút Messenger -->
         <a id="messenger-button" href="https://www.facebook.com/ThinhnguyenEDA" target="_blank">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Facebook_Messenger_logo_2020.svg/1024px-Facebook_Messenger_logo_2020.svg.png" alt="Messenger" style="width: 24px; height: 24px;">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnFAAg8Dio836vkCTmFgvadOWw67392K49lPFRiNQxIw&s=10" alt="Messenger" style="width: 24px; height: 24px;">
+        </a>
+
+        <a id="phone-button" href="tel:0123456789">
+            <img
+                src="data:image/jpeg;base64,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"
+                alt="Gọi điện"
+                style="width: 24px; height: 24px;"
+            >
         </a>
         <!-- Nút hỏi đáp -->
         <div id="chat-button" onclick="toggleChat()">💬 Hỏi đáp</div>
@@ -1432,6 +1572,7 @@ html body #life-journey-steps:empty {
                 
                 <div class="detailed-tabs">
                     <button class="tab-button active" onclick="openTab('overview')">Tổng quan</button>
+                    <button class="tab-button" onclick="openTab('career')">Định hướng nghề</button>
                     <button class="tab-button" onclick="openTab('lifepath')">Đường đời</button>
                     <button class="tab-button" onclick="openTab('destiny')">Sứ mệnh</button>
                     <button class="tab-button" onclick="openTab('soul')">Linh hồn</button>
@@ -1450,6 +1591,24 @@ html body #life-journey-steps:empty {
                     </div>
                     <div class="number-grid" id="overview-numbers">
                         <!-- Will be populated with number cards -->
+                    </div>
+                </div>
+
+                <!-- Định hướng nghề nghiệp – Venn + Ikigai -->
+                <div id="career" class="tab-content">
+                    <div class="nx-venn-wrap">
+                        <div class="nx-venn-title">ĐỊNH HƯỚNG NGHỀ NGHIỆP</div>
+                        <div class="nx-venn-sub">DỰA TRÊN NHÓM NGUỒN LỰC</div>
+                        <div id="career-venn"></div>
+                        <div class="nx-career-note" id="career-note">
+                            <!-- filled by JS -->
+                        </div>
+                    </div>
+                    <div class="nx-venn-wrap" style="margin-top:32px">
+                        <div class="nx-venn-title">KIẾN TẠO CUỘC ĐỜI MƠ ƯỚC</div>
+                        <div class="nx-venn-sub">IKIGAI – Giao điểm 4 nguồn lực</div>
+                        <div id="ikigai-diagram"></div>
+                        <div class="nx-ikigai-grid" id="ikigai-cards"></div>
                     </div>
                 </div>
                 
@@ -2002,6 +2161,14 @@ html body #life-journey-steps:empty {
                 challenge2,
                 challenge3,
                 challenge4,
+                age1,
+                age2,
+                age3,
+                age4,
+                cyear1,
+                cyear2,
+                cyear3,
+                cyear4,
             };
 
             const results = [
@@ -2248,19 +2415,55 @@ html body #life-journey-steps:empty {
 
         // Lấy mô tả cho từng số
         // Lấy mô tả cho từng số
+        // Bộ mô tả offline – luôn có nội dung khi API không hoạt động
+        const OFFLINE_MEANINGS = {
+            1: { title: "Lãnh đạo – Khởi đầu", text: "Số 1 mang năng lượng tiên phong, độc lập và quyết đoán. Bạn được sinh ra để dẫn dắt, khởi xướng ý tưởng mới và tự chịu trách nhiệm. Năng lượng chuẩn: tự tin, sáng tạo. Ngược: độc đoán, cô đơn. Quá mức: kiểm soát. Thực hành: chọn ngày số 1 để bắt đầu dự án; thiền khẳng định bản thân 10 phút mỗi sáng." },
+            2: { title: "Hợp tác – Hòa giải", text: "Số 2 biểu tượng sự nhạy cảm, hợp tác và cân bằng. Bạn giỏi lắng nghe, kết nối và tạo hòa khí. Năng lượng chuẩn: thấu cảm, kiên nhẫn. Ngược: phụ thuộc, do dự. Quá mức: hy sinh quá mức. Thực hành: làm việc nhóm, chọn ngày số 2 để đàm phán; thực hành biết ơn với những người đồng hành." },
+            3: { title: "Sáng tạo – Biểu đạt", text: "Số 3 là năng lượng sáng tạo, giao tiếp và vui vẻ. Bạn có tài kể chuyện, nghệ thuật và lan tỏa cảm hứng. Năng lượng chuẩn: lạc quan, hài hước. Ngược: phân tán, nói nhiều làm ít. Quá mức: khoe khoang. Thực hành: viết nhật ký sáng tạo, chọn ngày số 3 để thuyết trình; chia sẻ niềm vui với cộng đồng." },
+            4: { title: "Nền tảng – Kỷ luật", text: "Số 4 mang năng lượng vững chắc, thực tế và xây dựng. Bạn giỏi tổ chức, kiên trì và tạo hệ thống bền vững. Năng lượng chuẩn: trách nhiệm, logic. Ngược: cứng nhắc, sợ thay đổi. Quá mức: công việc hóa. Thực hành: lập kế hoạch dài hạn, chọn ngày số 4 để hoàn thành việc quan trọng; xây dựng thói quen đều đặn." },
+            5: { title: "Tự do – Thay đổi", text: "Số 5 là năng lượng tự do, phiêu lưu và thích ứng. Bạn yêu sự đa dạng, học hỏi nhanh và không chịu bị gò bó. Năng lượng chuẩn: linh hoạt, tò mò. Ngược: bốc đồng, không gắn bó. Quá mức: chạy trốn trách nhiệm. Thực hành: thử trải nghiệm mới có kiểm soát, chọn ngày số 5 để đi du lịch hoặc học kỹ năng mới." },
+            6: { title: "Yêu thương – Trách nhiệm", text: "Số 6 biểu tượng tình yêu, chăm sóc và trách nhiệm gia đình/cộng đồng. Bạn có trái tim ấm áp và muốn che chở người khác. Năng lượng chuẩn: tận tụy, hài hòa. Ngược: lo lắng quá mức, kiểm soát. Quá mức: hy sinh bản thân. Thực hành: chăm sóc bản thân trước, chọn ngày số 6 để gắn kết gia đình; phóng sinh hoặc giúp đỡ người cần." },
+            7: { title: "Trí tuệ – Nội tâm", text: "Số 7 mang năng lượng phân tích, tâm linh và tìm kiếm chân lý. Bạn thích suy ngẫm, nghiên cứu và kết nối với thế giới nội tâm. Năng lượng chuẩn: sâu sắc, trực giác. Ngược: cô lập, hoài nghi. Quá mức: thoát ly thực tế. Thực hành: thiền 15 phút/ngày, chọn ngày số 7 để học hỏi sâu; ghi nhật ký nội tâm." },
+            8: { title: "Quyền lực – Thành tựu", text: "Số 8 là năng lượng quyền lực, tài chính và thành tựu vật chất. Bạn có khả năng quản lý, lãnh đạo quy mô lớn và tạo ra giá trị. Năng lượng chuẩn: tham vọng lành mạnh, công bằng. Ngược: tham lam, áp lực. Quá mức: coi trọng vật chất. Thực hành: cân bằng công việc – cuộc sống, chọn ngày số 8 để ký kết hoặc đầu tư; chia sẻ thành quả." },
+            9: { title: "Nhân đạo – Hoàn thiện", text: "Số 9 mang năng lượng bao dung, hoàn thiện và phụng sự. Bạn nhìn xa, muốn đóng góp cho nhân loại và kết thúc chu kỳ một cách đẹp đẽ. Năng lượng chuẩn: từ bi, bao quát. Ngược: buông xuôi, lý tưởng hóa. Quá mức: hy sinh không biên giới. Thực hành: làm từ thiện, chọn ngày số 9 để hoàn tất việc cũ; thực hành tha thứ và buông bỏ." },
+            11: { title: "Số chủ – Trực giác", text: "Số chủ 11 là năng lượng trực giác cao, cảm hứng và sứ mệnh ánh sáng. Bạn nhạy cảm đặc biệt với năng lượng xung quanh và có khả năng truyền cảm hứng. Năng lượng chuẩn: trực giác mạnh, truyền cảm. Ngược: lo âu, dao động cảm xúc. Thực hành: bảo vệ năng lượng (thiền, hạn chế môi trường độc hại), chọn ngày 11 hoặc 2 để sáng tạo và dẫn dắt tinh thần." },
+            22: { title: "Số chủ – Xây dựng lớn", text: "Số chủ 22 là Kiến trúc sư bậc thầy – khả năng biến tầm nhìn lớn thành hiện thực quy mô. Bạn kết hợp trực giác 11 với thực tế 4. Năng lượng chuẩn: tầm nhìn + hành động. Ngược: áp lực quá lớn, trì hoãn. Thực hành: chia mục tiêu lớn thành bước nhỏ, chọn ngày 22 hoặc 4 để khởi công dự án lớn; kiên trì xây dựng hệ thống." },
+            33: { title: "Số chủ – Phụng sự tối cao", text: "Số chủ 33 là năng lượng yêu thương vô điều kiện và phụng sự ở cấp độ cao nhất. Bạn mang sứ mệnh chữa lành và nâng đỡ cộng đồng. Năng lượng chuẩn: từ bi sâu, dạy dỗ bằng tấm gương. Ngược: gánh nặng cảm xúc. Thực hành: cân bằng cho và nhận, chọn ngày 33 hoặc 6 để hoạt động cộng đồng; nuôi dưỡng bản thân để có thể phụng sự lâu dài." }
+        };
+
+        const ASPECT_INTRO = {
+            'đường đời': 'Đường đời là thân cây của Cây Cuộc Đời – bài học cốt lõi bạn cần trải nghiệm và tốt nghiệp trong kiếp này.',
+            'sứ mệnh': 'Sứ mệnh là tán cây – mục đích sống và cách bạn cống hiến cho thế giới thông qua tên gọi.',
+            'linh hồn': 'Linh hồn là rễ cây – khát khao sâu thẳm, động lực nội tại thúc đẩy bạn.',
+            'nhân cách': 'Nhân cách là lớp vỏ bên ngoài – cách người khác nhìn nhận và cảm nhận về bạn.',
+            'cân bằng': 'Cân bằng cho thấy cách bạn xử lý xung đột và tìm điểm hòa hợp trong các mối quan hệ.',
+            'trưởng thành': 'Trưởng thành là điểm hội tụ Đường đời + Sứ mệnh – hướng phát triển dài hạn và sự nghiệp đỉnh cao.',
+            'liên kết': 'Liên kết là cầu nối giữa Đường đời và Sứ mệnh – bài học cần vượt để hai năng lượng hòa quyện.',
+            'chặng hiện tại': 'Chặng hiện tại phản ánh năng lượng chủ đạo của giai đoạn đời bạn đang trải qua.',
+            'thách thức hiện tại': 'Thách thức hiện tại là bài học cần vượt qua trong giai đoạn này để trưởng thành hơn.'
+        };
+
+        function getOfflineDescription(number, aspect) {
+            const n = typeof number === 'number' ? number : parseInt(number, 10);
+            const base = OFFLINE_MEANINGS[n] || OFFLINE_MEANINGS[((n - 1) % 9) + 1] || {
+                title: `Số ${n}`,
+                text: `Số ${n} mang năng lượng riêng trong thần số học. Hãy quan sát cách nó xuất hiện trong đời sống hàng ngày và thực hành cân bằng năng lượng.`
+            };
+            const intro = ASPECT_INTRO[aspect] || `Chỉ số ${aspect} số ${n} trong bản đồ thần số học của bạn.`;
+            return `<strong>${intro}</strong><br><br><em>${base.title}</em><br>${base.text}`;
+        }
+
         async function getNumberDescription(number, aspect) {
             if (!numerologyResults) return "Vui lòng tính toán các chỉ số trước.";
 
-            // Tùy chỉnh mô tả dựa trên khái niệm Cây Cuộc Đời và năng lượng số
-            const context = `Bạn là một chuyên gia Thần Số Học. Hãy mô tả ý nghĩa của ${aspect} số ${number} trong Thần Số Học bằng tiếng Việt, ngắn gọn (150-200 từ), sâu sắc, và giáo dục. Tích hợp khái niệm "Cây Cuộc Đời" (Rễ: tố chất bẩm sinh, Thân: bài học Đường Đời, Tán: Sứ Mệnh) để giải thích ý nghĩa. Đề cập đến năng lượng chuẩn, ngược, quá mức của số này, nghiệp/phước liên quan, và cách áp dụng thực tiễn (ví dụ: chọn ngày số phù hợp, thiền, phóng sinh, biết ơn). Nếu là số chủ (11, 22, 33), nhấn mạnh ý nghĩa đặc biệt.`;
+            // Ưu tiên offline ngay để UI luôn có nội dung
+            const offline = getOfflineDescription(number, aspect);
 
+            // Thử API (timeout ngắn), nếu thành công thì dùng bản AI, không thì giữ offline
+            const context = `Bạn là chuyên gia Thần Số Học. Mô tả ${aspect} số ${number} bằng tiếng Việt, 120-180 từ, sâu sắc. Dùng khái niệm Cây Cuộc Đời. Nêu năng lượng chuẩn/ngược và 1 lời khuyên thực hành.`;
             const url = "https://api.cohere.com/v1/chat";
-            const data = {
-                model: "command-r-plus",
-                message: context,
-                temperature: 0.7,
-                max_tokens: 300,
-            };
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), 6000);
 
             try {
                 const response = await fetch(url, {
@@ -2269,14 +2472,24 @@ html body #life-journey-steps:empty {
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${COHERE_API_KEY}`,
                     },
-                    body: JSON.stringify(data),
+                    body: JSON.stringify({
+                        model: "command-r-plus",
+                        message: context,
+                        temperature: 0.7,
+                        max_tokens: 280,
+                    }),
+                    signal: controller.signal,
                 });
-
+                clearTimeout(timer);
+                if (!response.ok) return offline;
                 const result = await response.json();
-                return result.text;
+                const text = result.text || result.message?.content || '';
+                if (typeof text === 'string' && text.length > 60) return text;
+                return offline;
             } catch (error) {
-                console.error("Lỗi khi lấy mô tả:", error);
-                return "Không thể lấy mô tả vào lúc này.";
+                clearTimeout(timer);
+                console.warn("API mô tả không khả dụng, dùng offline:", error.message || error);
+                return offline;
             }
         }
 
@@ -2434,6 +2647,333 @@ html body #life-journey-steps:empty {
 
 
 
+        // Vẽ sơ đồ Venn 4 vòng – Định hướng nghề nghiệp (layout sạch, chữ không đè)
+        function renderCareerVenn() {
+            if (!numerologyResults) return;
+            const r = numerologyResults;
+            const dayVal = reduceNumber(parseInt(document.getElementById('birthDay').value) || 1);
+            const passion = r.passion || 0;
+            const chang = r.chang1 || 0;
+            const soul = reduceNumber(r.soulValue);
+
+            const container = document.getElementById('career-venn');
+            if (!container) return;
+
+            // Layout: 4 circles in diamond, labels only in outer non-overlap zones
+            container.innerHTML = `
+            <svg class="nx-venn-svg"
+                viewBox="0 0 440 400"
+                xmlns="http://www.w3.org/2000/svg">
+
+            <defs>
+                <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="2" result="b"/>
+                <feMerge>
+                    <feMergeNode in="b"/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+                </filter>
+            </defs>
+
+            <!-- 1. TÔ MÀU 4 HÌNH TRÒN -->
+            <!-- Tách phần tô màu và phần viền để viền không bị che -->
+
+            <g id="venn-fills">
+                <circle cx="220" cy="195" r="88"
+                fill="rgba(160,100,210,0.38)"/>
+
+                <circle cx="270" cy="250" r="88"
+                fill="rgba(210,140,190,0.32)"/>
+
+                <circle cx="220" cy="295" r="88"
+                fill="rgba(190,100,150,0.38)"/>
+
+                <circle cx="170" cy="250" r="88"
+                fill="rgba(120,60,130,0.42)"/>
+            </g>
+
+            <!-- 2. VẼ LẠI TOÀN BỘ VIỀN Ở LỚP TRÊN CÙNG -->
+            <!-- Viền trắng rõ, giao nhau sắc nét giống ảnh mẫu -->
+
+            <g id="venn-strokes"
+                fill="none"
+                stroke="rgba(255,255,255,0.85)"
+                stroke-width="2.4">
+
+                <circle cx="220" cy="195" r="88"/>
+                <circle cx="270" cy="250" r="88"/>
+                <circle cx="220" cy="295" r="88"/>
+                <circle cx="170" cy="250" r="88"/>
+
+            </g>
+
+            <!-- 3. ĐƯỜNG ĐỜI + NGÀY SINH -->
+            <!-- Đưa chữ vào bên trong hình tròn phía trên -->
+
+            <g text-anchor="middle">
+                <text x="220" y="125"
+                    fill="#f0e6ff" font-size="7" font-weight="700">
+                    ĐƯỜNG ĐỜI
+                </text>
+
+                <text x="220" y="148"
+                    fill="#ffffff" font-size="15" font-weight="800">
+                    ${r.birthValue}
+                </text>
+
+                <text x="220" y="161"
+                    fill="#e0d0ff" font-size="7">
+                    Ngày sinh: ${dayVal}
+                </text>
+            </g>
+
+            <!-- 4. SỨ MỆNH -->
+            <!-- Căn vào phần bên phải hình tròn -->
+
+            <g text-anchor="middle">
+                <text x="325" y="237"
+                    fill="#f0e6ff" font-size="7" font-weight="700">
+                    SỨ MỆNH
+                </text>
+
+                <text x="325" y="259"
+                    fill="#ffffff" font-size="15" font-weight="800">
+                    ${r.finalSum}
+                </text>
+            </g>
+
+            <!-- 5. CHẶNG -->
+            <!-- Đặt đối xứng với Sứ mệnh -->
+
+            <g text-anchor="middle">
+                <text x="115" y="237"
+                    fill="#f0e6ff" font-size="7" font-weight="700">
+                    CHẶNG
+                </text>
+
+                <text x="115" y="259"
+                    fill="#ffffff" font-size="15" font-weight="800">
+                    ${chang}
+                </text>
+            </g>
+
+            <!-- 6. LINH HỒN + ĐAM MÊ -->
+            <!-- Thu nhỏ chữ để nằm gọn trong hình tròn phía dưới -->
+
+            <g text-anchor="middle">
+                <text x="220" y="342"
+                    fill="#f0e6ff" font-size="7" font-weight="700">
+                    LINH HỒN
+                </text>
+
+                <text x="220" y="362"
+                    fill="#ffffff" font-size="15" font-weight="800">
+                    ${soul}
+                </text>
+
+                <text x="220" y="376"
+                    fill="#e0d0ff" font-size="8">
+                    Đam mê: ${passion}
+                </text>
+            </g>
+
+            </svg>`;
+
+            const note = document.getElementById('career-note');
+            if (note) {
+                note.innerHTML = `
+                    <strong>→ Từ khi bắt đầu chọn khối, chọn trường</strong><br>
+                    Nhóm nguồn lực: Đường đời <b>${r.birthValue}</b> · Ngày sinh <b>${dayVal}</b> · Sứ mệnh <b>${r.finalSum}</b> · Linh hồn <b>${soul}</b> · Đam mê <b>${passion}</b> · Chặng <b>${chang}</b>.
+                    Dùng bộ số này làm kim chỉ nam khi chọn ngành học và nghề nghiệp.
+                `;
+            }
+        }
+
+        // Vẽ sơ đồ Ikigai – bố cục kim cương giống Định hướng nghề (trên/dưới/trái/phải)
+        function renderIkigai() {
+            if (!numerologyResults) return;
+            const r = numerologyResults;
+            const container = document.getElementById('ikigai-diagram');
+            if (!container) return;
+
+
+            
+            container.innerHTML = `
+            <svg class="nx-venn-svg"
+                viewBox="0 0 440 400"
+                xmlns="http://www.w3.org/2000/svg">
+
+                <defs>
+                    <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur stdDeviation="2" result="b"/>
+                        <feMerge>
+                            <feMergeNode in="b"/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+
+                <!-- 1. FOUR CIRCLE FILLS -->
+                <!-- Giữ nguyên màu sắc IKIGAI ban đầu -->
+                <g id="venn-fills">
+                    <circle cx="220" cy="195" r="88"
+                        fill="rgba(210,55,50,0.5)"/>
+
+                    <circle cx="270" cy="250" r="88"
+                        fill="rgba(45,95,200,0.5)"/>
+
+                    <circle cx="220" cy="295" r="88"
+                        fill="rgba(35,150,75,0.5)"/>
+
+                    <circle cx="170" cy="250" r="88"
+                        fill="rgba(210,170,35,0.48)"/>
+                </g>
+
+                <!-- 2. CIRCLE OUTLINES -->
+                <g id="venn-strokes"
+                    fill="none"
+                    stroke="rgba(255,255,255,0.4)"
+                    stroke-width="1.5">
+
+                    <circle cx="220" cy="195" r="88"/>
+                    <circle cx="270" cy="250" r="88"/>
+                    <circle cx="220" cy="295" r="88"/>
+                    <circle cx="170" cy="250" r="88"/>
+
+                </g>
+
+                <!-- 3. TOP: PASSION -->
+                <g text-anchor="middle">
+                    <text x="220" y="125"
+                        fill="#ffe0e0"
+                        font-size="9"
+                        font-weight="600">
+                        Việc bạn THÍCH
+                    </text>
+
+                    <text x="220" y="143"
+                        fill="#ffffff"
+                        font-size="11"
+                        font-weight="700">
+                        ĐAM MÊ
+                    </text>
+
+                    <text x="220" y="165"
+                        fill="#ffffff"
+                        font-size="19"
+                        font-weight="800">
+                        ${r.passion || '—'}
+                    </text>
+                </g>
+
+                <!-- 4. RIGHT: MISSION -->
+                <g text-anchor="middle">
+                    <text x="310" y="220"
+                        fill="#d0e0ff"
+                        font-size="8"
+                        font-weight="600">
+                        Xã hội CẦN
+                    </text>
+
+                    <text x="310" y="237"
+                        fill="#ffffff"
+                        font-size="10"
+                        font-weight="700">
+                        SỨ MỆNH
+                    </text>
+
+                    <text x="310" y="258"
+                        fill="#ffffff"
+                        font-size="19"
+                        font-weight="800">
+                        ${r.finalSum}
+                    </text>
+                </g>
+
+                <!-- 5. BOTTOM: CAREER -->
+                <g text-anchor="middle">
+                    <text x="220" y="326"
+                        fill="#c0ffd0"
+                        font-size="8"
+                        font-weight="600">
+                        Mang lại THU NHẬP
+                    </text>
+
+                    <text x="220" y="344"
+                        fill="#ffffff"
+                        font-size="10"
+                        font-weight="700">
+                        SỰ NGHIỆP
+                    </text>
+
+                    <text x="220" y="365"
+                        fill="#ffffff"
+                        font-size="19"
+                        font-weight="800">
+                        ${r.maturityValue}
+                    </text>
+                </g>
+
+                <!-- 6. LEFT: EXPERTISE -->
+                <g text-anchor="middle">
+                    <text x="130" y="220"
+                        fill="#fff5c0"
+                        font-size="8"
+                        font-weight="600">
+                        Bạn LÀM TỐT
+                    </text>
+
+                    <text x="130" y="237"
+                        fill="#ffffff"
+                        font-size="10"
+                        font-weight="700">
+                        CHUYÊN MÔN
+                    </text>
+
+                    <text x="130" y="258"
+                        fill="#ffffff"
+                        font-size="19"
+                        font-weight="800">
+                        ${r.birthValue}
+                    </text>
+                </g>
+
+                <!-- 7. CENTER: IKIGAI -->
+                <text text-anchor="middle"
+                    x="220"
+                    y="249"
+                    fill="#ffd700"
+                    font-size="12"
+                    font-weight="800"
+                    letter-spacing="1">
+                    IKIGAI
+                </text>
+
+            </svg>`;
+
+            const cards = document.getElementById('ikigai-cards');
+            if (cards) {
+                cards.innerHTML = `
+                    <div class="nx-ikigai-card">
+                        <h4>🔥 Đam mê (Passion)</h4>
+                        <p>Số Đam mê <strong>${r.passion || '—'}</strong> – điều bạn yêu thích. Kết hợp Linh hồn ${reduceNumber(r.soulValue)}.</p>
+                    </div>
+                    <div class="nx-ikigai-card">
+                        <h4>🌟 Sứ mệnh (Mission)</h4>
+                        <p>Số Sứ mệnh <strong>${r.finalSum}</strong> – việc xã hội cần và bạn thấy ý nghĩa.</p>
+                    </div>
+                    <div class="nx-ikigai-card">
+                        <h4>🛠 Chuyên môn (Profession)</h4>
+                        <p>Số Đường đời <strong>${r.birthValue}</strong> – việc bạn làm tốt nhờ tố chất bẩm sinh.</p>
+                    </div>
+                    <div class="nx-ikigai-card">
+                        <h4>💼 Sự nghiệp (Vocation)</h4>
+                        <p>Số Trưởng thành <strong>${r.maturityValue}</strong> – giao điểm khả năng & thu nhập lâu dài.</p>
+                    </div>
+                `;
+            }
+        }
+
         // Điền nội dung cho modal chi tiết
         async function populateDetailedView() {
             if (!numerologyResults) {
@@ -2449,6 +2989,10 @@ html body #life-journey-steps:empty {
             document.getElementById('personality-value').textContent = numerologyResults.personalityValue;
             document.getElementById('balance-value').textContent = numerologyResults.balanceValue;
             document.getElementById('maturity-value').textContent = numerologyResults.maturityValue;
+
+            // Vẽ sơ đồ định hướng nghề + Ikigai
+            renderCareerVenn();
+            renderIkigai();
             
             // Tạo biểu đồ tổng quan
             const overviewData = [
@@ -2538,32 +3082,31 @@ html body #life-journey-steps:empty {
             // Điền nội dung 8 bước kỹ thuật liên kết
             await populateLifeJourneySteps();
             
-            // Điền nội dung 8 bước coach phễu
-            populateCoachFunnelSteps();
+            // Coach funnel (nếu container tồn tại)
+            const coachEl = document.getElementById('coach-funnel-steps');
+            if (coachEl && typeof populateCoachFunnelSteps === 'function') {
+                populateCoachFunnelSteps();
+            } else if (coachEl) {
+                coachEl.innerHTML = `<h4>Gợi ý coach phễu</h4>
+                <p>Dựa trên Đường đời <strong>${numerologyResults.birthValue}</strong> và Sứ mệnh <strong>${numerologyResults.finalSum}</strong>, hãy bắt đầu từ nhận diện năng lượng Linh hồn, vượt bài học Đường đời, rồi hoàn thành Sứ mệnh – đó là phễu phát triển bản thân theo thần số học.</p>`;
+            }
             
-            // Lấy mô tả từ AI cho từng số
-            getNumberDescription(numerologyResults.birthValue, 'đường đời').then(desc => {
-                document.getElementById('lifepath-description').innerHTML = `<p>${desc}</p>`;
-            });
-            
-            getNumberDescription(numerologyResults.finalSum, 'sứ mệnh').then(desc => {
-                document.getElementById('destiny-description').innerHTML = `<p>${desc}</p>`;
-            });
-            
-            getNumberDescription(numerologyResults.soulValue, 'linh hồn').then(desc => {
-                document.getElementById('soul-description').innerHTML = `<p>${desc}</p>`;
-            });
-            
-            getNumberDescription(numerologyResults.personalityValue, 'nhân cách').then(desc => {
-                document.getElementById('personality-description').innerHTML = `<p>${desc}</p>`;
-            });
-            
-            getNumberDescription(numerologyResults.balanceValue, 'cân bằng').then(desc => {
-                document.getElementById('balance-description').innerHTML = `<p>${desc}</p>`;
-            });
-            
-            getNumberDescription(numerologyResults.maturityValue, 'trưởng thành').then(desc => {
-                document.getElementById('maturity-description').innerHTML = `<p>${desc}</p>`;
+            // Hiển thị mô tả offline ngay lập tức, sau đó nâng cấp bằng API nếu có
+            const descTargets = [
+                ['lifepath-description', numerologyResults.birthValue, 'đường đời'],
+                ['destiny-description', numerologyResults.finalSum, 'sứ mệnh'],
+                ['soul-description', numerologyResults.soulValue, 'linh hồn'],
+                ['personality-description', numerologyResults.personalityValue, 'nhân cách'],
+                ['balance-description', numerologyResults.balanceValue, 'cân bằng'],
+                ['maturity-description', numerologyResults.maturityValue, 'trưởng thành'],
+            ];
+            descTargets.forEach(([id, num, aspect]) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.innerHTML = `<p>${getOfflineDescription(num, aspect)}</p>`;
+                getNumberDescription(num, aspect).then(desc => {
+                    if (desc && desc.length > 40) el.innerHTML = `<p>${desc}</p>`;
+                });
             });
             
             // Mô tả thách thức
@@ -2836,6 +3379,26 @@ html body #life-journey-steps:empty {
     ORBS.forEach(o => {
       const el = h('span', { class: 'nx-orb' });
       el.style.cssText = `--h:${o.h};--s:${o.s}vmax;left:${o.x};top:${o.y};animation-duration:${o.t}s;animation-delay:${o.dl}s`;
+      bg.append(el);
+    });
+    // Floating numerology numbers (inspired by xemthansohoc.online)
+    const floatNums = [
+      { n: '1', x: '8%',  y: '18%', s: 3.2, d: 0,   gold: false },
+      { n: '2', x: '88%', y: '12%', s: 2.6, d: 4,   gold: false },
+      { n: '3', x: '12%', y: '72%', s: 2.8, d: 8,   gold: false },
+      { n: '5', x: '78%', y: '68%', s: 3.4, d: 2,   gold: true  },
+      { n: '6', x: '92%', y: '42%', s: 2.2, d: 12,  gold: false },
+      { n: '7', x: '5%',  y: '48%', s: 2.4, d: 6,   gold: false },
+      { n: '8', x: '18%', y: '8%',  s: 2.0, d: 10,  gold: false },
+      { n: '9', x: '70%', y: '22%', s: 2.5, d: 3,   gold: false },
+      { n: '11',x: '85%', y: '85%', s: 2.8, d: 7,   gold: true  },
+      { n: '22',x: '25%', y: '88%', s: 2.3, d: 14,  gold: true  },
+      { n: '4', x: '55%', y: '5%',  s: 1.8, d: 5,   gold: false },
+      { n: '33',x: '45%', y: '78%', s: 2.1, d: 9,   gold: true  },
+    ];
+    floatNums.forEach(f => {
+      const el = h('span', { class: 'nx-float-num' + (f.gold ? ' gold' : ''), text: f.n });
+      el.style.cssText = `left:${f.x};top:${f.y};font-size:${f.s}rem;animation-duration:${18 + f.d}s;animation-delay:-${f.d}s;`;
       bg.append(el);
     });
     const canvas = h('canvas', { class: 'nx-stars' });
